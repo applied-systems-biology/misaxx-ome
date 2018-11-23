@@ -21,7 +21,7 @@ namespace misaxx_ome {
      * @param opencv_type
      * @return
      */
-    template<typename RawType> cv::Mat ome_to_opencv_detail(const ome::files::VariantPixelBuffer &ome_buffer, int size_x, int size_y, int channels, int opencv_type) {
+    template<typename RawType> inline cv::Mat ome_to_opencv_detail(const ome::files::VariantPixelBuffer &ome_buffer, int size_x, int size_y, int channels, int opencv_type) {
         using namespace ome::files;
         cv::Mat result(size_y, size_x, opencv_type, cv::Scalar::all(0));
 
@@ -52,7 +52,7 @@ namespace misaxx_ome {
      * @param ome
      * @return
      */
-    cv::Mat ome_to_opencv(const ome::files::FormatReader &ome_reader, ome::files::dimension_size_type index) {
+    inline cv::Mat ome_to_opencv(const ome::files::FormatReader &ome_reader, ome::files::dimension_size_type index) {
         
         using namespace ome::xml::model::enums;
         
