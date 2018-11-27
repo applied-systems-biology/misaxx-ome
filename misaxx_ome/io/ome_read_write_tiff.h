@@ -148,6 +148,14 @@ namespace misaxx_ome {
           });
         }
 
+        ome::files::dimension_size_type get_num_images(ome::files::dimension_size_type series) const {
+            if(series != 0)
+                throw std::runtime_error("Only series 0 is currently supported!");
+            return get_reader_writer_property<ome::files::dimension_size_type>([](const auto &rw) {
+                return rw->getImageCount();
+            });
+        }
+
     private:
         boost::filesystem::path m_path;
         mutable std::shared_ptr<ome::files::out::OMETIFFWriter> m_writer;

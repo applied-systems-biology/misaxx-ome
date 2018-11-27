@@ -12,7 +12,7 @@ find_package(OMEXML 5.6.0 REQUIRED)
 
 add_library(misaxx_ome
         misaxx_ome/misa_ome.h
-        misaxx_ome/misa_ome.cpp misaxx_ome/io/ome_to_opencv.h misaxx_ome/caches/misa_ome_readonly_tiff.h misaxx_ome/caches/misa_ome_readonly_image.h misaxx_ome/patterns/misa_ome_tiff_pattern.h misaxx_ome/descriptions/misa_ome_tiff_description.h misaxx_ome/patterns/misa_ome_image_pattern.h misaxx_ome/descriptions/misa_ome_image_description.h misaxx_ome/io/opencv_to_ome.h misaxx_ome/io/ome_read_write_tiff.h misaxx_ome/io/ome_read_write_tiff.cpp)
+        misaxx_ome/misa_ome.cpp misaxx_ome/io/ome_to_opencv.h misaxx_ome/caches/misa_ome_tiff.h misaxx_ome/caches/misa_ome_image.h misaxx_ome/patterns/misa_ome_tiff_pattern.h misaxx_ome/descriptions/misa_ome_tiff_description.h misaxx_ome/patterns/misa_ome_image_pattern.h misaxx_ome/descriptions/misa_ome_image_description.h misaxx_ome/io/opencv_to_ome.h misaxx_ome/io/ome_read_write_tiff.h misaxx_ome/io/ome_read_write_tiff.cpp misaxx_ome/descriptions/misa_ome_series_description.h misaxx_ome/io/json_ome_pixel_type.h misaxx_ome/helpers/ome_helpers.h)
 
 target_link_libraries(misaxx_ome PUBLIC OME::Files)
 misa_module(misaxx_ome)
