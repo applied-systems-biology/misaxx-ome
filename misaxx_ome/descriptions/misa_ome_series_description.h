@@ -10,17 +10,45 @@
 #include <misaxx_ome/io/json_ome_pixel_type.h>
 #include <ome/files/CoreMetadata.h>
 #include <misaxx_ome/helpers/ome_helpers.h>
+#include <ome/xml/meta/OMEXMLMetadata.h>
+#include <string>
 
 namespace misaxx_ome {
     /**
-     * Describes an OME series
+     * Describes an OME series. This is equivalent to ome::files::CoreMetadata
+     * Can be converted from/to native OME data types
      */
     struct misa_ome_series_description : public misaxx::misa_data_description {
+        /**
+         * Width of a plane in this series
+         */
         int size_x = 0;
+
+        /**
+         * Height of a plane in this series
+         */
         int size_y = 0;
-        int num_images = 0;
+
+        /**
+         * Number of planes allocated in Z-axis (depth)
+         */
+        int size_z = 0;
+
+        /**
+         * Number of planes allocated in the time-axis
+         */
+        int size_t = 0;
+
+        /**
+         * The size of this vector is the number of planes allocated in the channel-axis
+         * The value stored within each array entry determines the number of channels within the plane
+         */
+        std::vector<ome::files::dimension_size_type> channels;
+
+        /**
+         * Pixel type of a channel in each plane
+         */
         ome::xml::model::enums::PixelType channel_type = ome::xml::model::enums::PixelType::UINT8;
-        int num_channels = 0;
 
         using misaxx::misa_data_description::misa_data_description;
 
@@ -30,34 +58,51 @@ namespace misaxx_ome {
          */
         explicit misa_ome_series_description(const ome::files::CoreMetadata &t_ome) : size_x(t_ome.sizeX),
                                                                                       size_y(t_ome.sizeY),
-                                                                                      num_images(t_ome.sizeZ),
+                                                                                      size_z(t_ome.sizeZ),
+                                                                                      size_t(t_ome.sizeT),
                                                                                       channel_type(t_ome.pixelType),
-                                                                                      num_channels(t_ome.sizeC.at(0)) {
-            if (t_ome.sizeC.size() != 1)
-                throw std::runtime_error("Unsupported number of channels!");
+                                                                                      channels(t_ome.sizeC) {
+        }
+
+        /**
+         * Loads this description from the native OME type
+         * @param t_ome
+         */
+        explicit misa_ome_series_description(const ome::xml::meta::OMEXMLMetadata &t_ome, ome::files::dimension_size_type series) :
+            size_x(t_ome.getPixelsSizeX(series)),
+            size_y(t_ome.getPixelsSizeY(series)),
+            size_z(t_ome.getPixelsSizeZ(series)),
+            size_t(t_ome.getPixelsSizeT(series)),
+            channel_type(t_ome.getPixelsType(series)) {
+            for(size_t channel = 0; channel < t_ome.getChannelCount(series); ++channel) {
+                channels.push_back(t_ome.getChannelSamplesPerPixel(series, channel));
+            }
         }
 
         void from_json(const nlohmann::json &t_json) override {
             size_x = t_json["size-x"];
             size_y = t_json["size-y"];
-            num_images = t_json["num-images"];
+            size_z = t_json["size-z"];
+            size_t = t_json["size-t"];
             channel_type = t_json["channel-type"];
-            num_channels = t_json["num-channels"];
+            channels = t_json["channels"];
         }
 
         void to_json(nlohmann::json &t_json) const override {
             t_json["size-x"] = size_x;
             t_json["size-y"] = size_y;
-            t_json["num-images"] = num_images;
+            t_json["size-z"] = size_z;
+            t_json["size-t"] = size_t;
             t_json["channel-type"] = channel_type;
-            t_json["num-channels"] = num_channels;
+            t_json["channels"] = channels;
         }
 
         void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
             t_schema.resolve("size-x").declare_required<int>();
             t_schema.resolve("size-y").declare_required<int>();
-            t_schema.resolve("num-images").declare_required<int>();
-            t_schema.resolve("num-channels").declare_required<int>();
+            t_schema.resolve("size-z").declare_required<int>();
+            t_schema.resolve("size-t").declare_required<int>();
+            t_schema.resolve("channels").declare_required<std::vector<ome::files::dimension_size_type>>();
             std::vector<std::string> channel_types;
             for (const auto &kv : ome::xml::model::enums::PixelType::strings()) {
                 channel_types.push_back(kv.first);
@@ -78,10 +123,9 @@ namespace misaxx_ome {
             std::shared_ptr<ome::files::CoreMetadata> core(std::make_shared<ome::files::CoreMetadata>());
             core->sizeX = size_x;
             core->sizeY = size_y;
-            core->sizeC.clear(); // defaults to 1 channel with 1 subchannel; clear this
-            core->sizeC.push_back(num_channels);
-            core->sizeZ = num_images;
-            core->sizeT = 1;
+            core->sizeC = channels;
+            core->sizeZ = size_z;
+            core->sizeT = size_t;
             core->interleaved = false;
             core->dimensionOrder = ome::xml::model::enums::DimensionOrder::XYZTC;
             core->pixelType = channel_type;

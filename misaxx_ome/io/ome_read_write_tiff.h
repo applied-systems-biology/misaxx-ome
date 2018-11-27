@@ -19,6 +19,8 @@
 namespace misaxx_ome {
     /**
      * Allows thread-safe read and write access to an OME TIFF
+     * This wrapper will automatically switch between an OME TIFF reader and an OME TIFF writer depending on what functionality
+     * is currently being requested.
      */
     class ome_read_write_tiff {
     public:
@@ -62,20 +64,19 @@ namespace misaxx_ome {
                 : ome_read_write_tiff(std::move(t_path), t_reference.get_metadata()) {
         }
 
-        void write_image(const cv::Mat &image, ome::files::dimension_size_type series,
-                         ome::files::dimension_size_type index) {
-            if(series != 0)
+        void write_plane(const cv::Mat &image, const misa_ome_plane_location &index) {
+            if(index.series != 0)
                 throw std::runtime_error("Only series 0 is currently supported!");
             auto writer = get_writer();
-            writer.value->setSeries(series); // TODO: Mutex?
+//            writer.value->setSeries(index.series); // TODO: Mutex
             opencv_to_ome(image, *writer.value, index);
         }
 
-        cv::Mat read_image(ome::files::dimension_size_type series, ome::files::dimension_size_type index) const {
-            if(series != 0)
+        cv::Mat read_plane(const misa_ome_plane_location &index) const {
+            if(index.series != 0)
                 throw std::runtime_error("Only series 0 is currently supported!");
             auto reader = get_reader();
-            reader.value->setSeries(series); // TODO: Mutex?
+//            reader.value->setSeries(index.series); // TODO: Mutex
             return ome_to_opencv(*reader.value, index);
         }
 
@@ -143,17 +144,31 @@ namespace misaxx_ome {
         }
 
         ome::files::dimension_size_type get_num_series() const {
-          return get_reader_writer_property<ome::files::dimension_size_type>([](const auto &rw) {
-             return rw->getSeriesCount();
-          });
+            return get_metadata()->getImageCount();
         }
 
-        ome::files::dimension_size_type get_num_images(ome::files::dimension_size_type series) const {
-            if(series != 0)
-                throw std::runtime_error("Only series 0 is currently supported!");
-            return get_reader_writer_property<ome::files::dimension_size_type>([](const auto &rw) {
-                return rw->getImageCount();
-            });
+        ome::files::dimension_size_type get_size_x(ome::files::dimension_size_type series) const {
+            return get_metadata()->getPixelsSizeX(series);
+        }
+
+        ome::files::dimension_size_type get_size_y(ome::files::dimension_size_type series) const {
+            return get_metadata()->getPixelsSizeY(series);
+        }
+
+        ome::files::dimension_size_type get_size_z(ome::files::dimension_size_type series) const {
+            return get_metadata()->getPixelsSizeZ(series);
+        }
+
+        ome::files::dimension_size_type get_size_t(ome::files::dimension_size_type series) const {
+            return get_metadata()->getPixelsSizeT(series);
+        }
+
+        ome::files::dimension_size_type get_size_c(ome::files::dimension_size_type series) const {
+            return get_metadata()->getPixelsSizeC(series);
+        }
+
+        ome::files::dimension_size_type get_num_planes(ome::files::dimension_size_type series) const {
+            return get_size_c(series) * get_size_t(series) * get_size_z(series);
         }
 
     private:

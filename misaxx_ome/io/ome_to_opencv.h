@@ -8,6 +8,7 @@
 #include <ome/files/VariantPixelBuffer.h>
 #include <ome/files/FormatReader.h>
 #include <opencv2/opencv.hpp>
+#include <misaxx_ome/descriptions/misa_ome_plane_location.h>
 
 namespace misaxx_ome {
 
@@ -52,7 +53,7 @@ namespace misaxx_ome {
      * @param ome
      * @return
      */
-    inline cv::Mat ome_to_opencv(const ome::files::FormatReader &ome_reader, ome::files::dimension_size_type index) {
+    inline cv::Mat ome_to_opencv(const ome::files::FormatReader &ome_reader, const misa_ome_plane_location &index) {
         
         using namespace ome::xml::model::enums;
         
@@ -61,7 +62,7 @@ namespace misaxx_ome {
         int channels = static_cast<int>(ome_reader.getSizeC());
 
         ome::files::VariantPixelBuffer ome_buffer;
-        ome_reader.openBytes(index, ome_buffer);
+        ome_reader.openBytes(index.index_within(ome_reader), ome_buffer);
 
         switch(ome_buffer.pixelType()) {
             case PixelType::UINT8: 
