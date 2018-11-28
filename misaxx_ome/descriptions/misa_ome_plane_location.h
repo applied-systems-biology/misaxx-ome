@@ -10,6 +10,7 @@
 #include <ome/files/FormatWriter.h>
 #include <ome/files/out/OMETIFFWriter.h>
 #include <misaxx/misa_data_description.h>
+#include <ostream>
 
 namespace misaxx_ome {
 
@@ -39,12 +40,12 @@ namespace misaxx_ome {
 
         misa_ome_plane_location() = default;
 
-        misa_ome_plane_location(ome::files::dimension_size_type t_series) :
+        explicit misa_ome_plane_location(ome::files::dimension_size_type t_series) :
                 series(t_series), z(0), c(0), t(0) {
 
         }
 
-        misa_ome_plane_location(ome::files::dimension_size_type t_series, ome::files::dimension_size_type t_z, ome::files::dimension_size_type t_c, ome::files::dimension_size_type t_t) :
+        explicit misa_ome_plane_location(ome::files::dimension_size_type t_series, ome::files::dimension_size_type t_z, ome::files::dimension_size_type t_c, ome::files::dimension_size_type t_t) :
             series(t_series), z(t_z), c(t_c), t(t_t) {
 
         }
@@ -169,6 +170,11 @@ namespace misaxx_ome {
 
         bool operator!=(const misa_ome_plane_location &rhs) const {
             return !(rhs == *this);
+        }
+
+        friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_location &location) {
+            os << "s" << location.series << "z" << location.z << "c" << location.c << "t" << location.t;
+            return os;
         }
     };
 

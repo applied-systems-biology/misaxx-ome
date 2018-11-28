@@ -12,7 +12,7 @@
 #include <ome/xml/meta/Convert.h>
 #include <opencv2/opencv.hpp>
 #include <boost/filesystem.hpp>
-#include <cxxh/access/locked.h>
+#include <cxxh/cache.h>
 #include "ome_to_opencv.h"
 #include "opencv_to_ome.h"
 
@@ -25,8 +25,8 @@ namespace misaxx_ome {
     class ome_read_write_tiff {
     public:
 
-        using locked_reader_type = cxxh::access::locked<std::shared_ptr<ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
-        using locked_writer_type = cxxh::access::locked<std::shared_ptr<ome::files::out::OMETIFFWriter>, std::shared_lock<std::shared_mutex>>;
+        using locked_reader_type = cxxh::locked<std::shared_ptr<ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
+        using locked_writer_type = cxxh::locked<std::shared_ptr<ome::files::out::OMETIFFWriter>, std::shared_lock<std::shared_mutex>>;
 
         ome_read_write_tiff() = default;
 
@@ -204,6 +204,7 @@ namespace misaxx_ome {
             m_writer = std::make_shared<ome::files::out::OMETIFFWriter>();
             m_writer->setMetadataRetrieve(metadata);
             m_writer->setInterleaved(false);
+            m_writer->setWriteSequentially(false);
             m_writer->setId(m_path);
         }
 

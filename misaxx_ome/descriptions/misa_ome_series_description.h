@@ -22,22 +22,22 @@ namespace misaxx_ome {
         /**
          * Width of a plane in this series
          */
-        int size_x = 0;
+        int size_X = 0;
 
         /**
          * Height of a plane in this series
          */
-        int size_y = 0;
+        int size_Y = 0;
 
         /**
          * Number of planes allocated in Z-axis (depth)
          */
-        int size_z = 0;
+        int size_Z = 0;
 
         /**
          * Number of planes allocated in the time-axis
          */
-        int size_t = 0;
+        int size_T = 0;
 
         /**
          * The size of this vector is the number of planes allocated in the channel-axis
@@ -56,10 +56,10 @@ namespace misaxx_ome {
          * Loads this description from the native OME type
          * @param t_ome
          */
-        explicit misa_ome_series_description(const ome::files::CoreMetadata &t_ome) : size_x(t_ome.sizeX),
-                                                                                      size_y(t_ome.sizeY),
-                                                                                      size_z(t_ome.sizeZ),
-                                                                                      size_t(t_ome.sizeT),
+        explicit misa_ome_series_description(const ome::files::CoreMetadata &t_ome) : size_X(t_ome.sizeX),
+                                                                                      size_Y(t_ome.sizeY),
+                                                                                      size_Z(t_ome.sizeZ),
+                                                                                      size_T(t_ome.sizeT),
                                                                                       channel_type(t_ome.pixelType),
                                                                                       channels(t_ome.sizeC) {
         }
@@ -69,10 +69,10 @@ namespace misaxx_ome {
          * @param t_ome
          */
         explicit misa_ome_series_description(const ome::xml::meta::OMEXMLMetadata &t_ome, ome::files::dimension_size_type series) :
-            size_x(t_ome.getPixelsSizeX(series)),
-            size_y(t_ome.getPixelsSizeY(series)),
-            size_z(t_ome.getPixelsSizeZ(series)),
-            size_t(t_ome.getPixelsSizeT(series)),
+            size_X(t_ome.getPixelsSizeX(series)),
+            size_Y(t_ome.getPixelsSizeY(series)),
+            size_Z(t_ome.getPixelsSizeZ(series)),
+            size_T(t_ome.getPixelsSizeT(series)),
             channel_type(t_ome.getPixelsType(series)) {
             for(size_t channel = 0; channel < t_ome.getChannelCount(series); ++channel) {
                 channels.push_back(t_ome.getChannelSamplesPerPixel(series, channel));
@@ -80,19 +80,19 @@ namespace misaxx_ome {
         }
 
         void from_json(const nlohmann::json &t_json) override {
-            size_x = t_json["size-x"];
-            size_y = t_json["size-y"];
-            size_z = t_json["size-z"];
-            size_t = t_json["size-t"];
+            size_X = t_json["size-x"];
+            size_Y = t_json["size-y"];
+            size_Z = t_json["size-z"];
+            size_T = t_json["size-t"];
             channel_type = t_json["channel-type"];
-            channels = t_json["channels"];
+            channels = t_json["channels"].get<std::vector<ome::files::dimension_size_type>>();
         }
 
         void to_json(nlohmann::json &t_json) const override {
-            t_json["size-x"] = size_x;
-            t_json["size-y"] = size_y;
-            t_json["size-z"] = size_z;
-            t_json["size-t"] = size_t;
+            t_json["size-x"] = size_X;
+            t_json["size-y"] = size_Y;
+            t_json["size-z"] = size_Z;
+            t_json["size-t"] = size_T;
             t_json["channel-type"] = channel_type;
             t_json["channels"] = channels;
         }
@@ -121,11 +121,11 @@ namespace misaxx_ome {
          */
         inline std::shared_ptr<ome::files::CoreMetadata> as_ome() const {
             std::shared_ptr<ome::files::CoreMetadata> core(std::make_shared<ome::files::CoreMetadata>());
-            core->sizeX = size_x;
-            core->sizeY = size_y;
+            core->sizeX = size_X;
+            core->sizeY = size_Y;
             core->sizeC = channels;
-            core->sizeZ = size_z;
-            core->sizeT = size_t;
+            core->sizeZ = size_Z;
+            core->sizeT = size_T;
             core->interleaved = false;
             core->dimensionOrder = ome::xml::model::enums::DimensionOrder::XYZTC;
             core->pixelType = channel_type;
