@@ -11,7 +11,7 @@
 #include <misaxx_ome/patterns/misa_ome_tiff_pattern.h>
 #include <misaxx_ome/descriptions/misa_ome_tiff_description.h>
 #include <misaxx/misa_cached_data.h>
-#include <misaxx_ome/io/ome_read_write_tiff.h>
+#include <misaxx_ome/io/ome_tiff_io.h>
 #include <misaxx_ome/accessors/misa_ome_plane.h>
 
 namespace misaxx_ome {
@@ -36,7 +36,7 @@ namespace misaxx_ome {
 
             if(boost::filesystem::is_regular_file(get_unique_location())) {
                 std::cout << "[Cache] Opening OME TIFF " << get_unique_location() << std::endl;
-                m_tiff = std::make_shared<ome_read_write_tiff>(get_unique_location());
+                m_tiff = std::make_shared<ome_tiff_io>(get_unique_location());
                 write_description = true;
             }
             else {
@@ -57,8 +57,13 @@ namespace misaxx_ome {
 
                 ome::files::fillMetadata(*meta, series_list);
 
+                // TODO test
+                for(size_t p = 0; p < t_description.series[0].size_Z; ++p) {
+                    meta->setUUIDFileName("img" + cxxh::to_string(p), 0, p);
+                }
+
                 // Create the TIFF and generate the image caches
-                m_tiff = std::make_shared<ome_read_write_tiff>(get_unique_location(), meta);
+                m_tiff = std::make_shared<ome_tiff_io>(get_unique_location(), meta);
                 write_description = false;
             }
 
@@ -95,7 +100,7 @@ namespace misaxx_ome {
          * Returns the ome::files tiff reader instance.
          * @return
          */
-        std::shared_ptr<ome_read_write_tiff> get_tiff_reader() const {
+        std::shared_ptr<ome_tiff_io> get_tiff_io() const {
             return m_tiff;
         }
 
@@ -121,6 +126,12 @@ namespace misaxx_ome {
             return get().at(index);
         }
 
+        void postprocess() override {
+            misa_cache::postprocess();
+            // Close the TIFF
+            m_tiff->close();
+        }
+
     protected:
         misa_ome_tiff_description produce_description(const boost::filesystem::path &t_location,
                                                       const misa_ome_tiff_pattern &t_pattern) override {
@@ -132,7 +143,7 @@ namespace misaxx_ome {
 
     private:
 
-        std::shared_ptr<ome_read_write_tiff> m_tiff;
+        std::shared_ptr<ome_tiff_io> m_tiff;
 
     };
 }

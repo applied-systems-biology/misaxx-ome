@@ -21,20 +21,22 @@ namespace misaxx_ome {
      * Allows thread-safe read and write access to an OME TIFF
      * This wrapper will automatically switch between an OME TIFF reader and an OME TIFF writer depending on what functionality
      * is currently being requested.
+     *
+     * Please note that this IO, similar to ome::files TIFF reader & writer needs to be closed manually
      */
-    class ome_read_write_tiff {
+    class ome_tiff_io {
     public:
 
         using locked_reader_type = cxxh::locked<std::shared_ptr<ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
         using locked_writer_type = cxxh::locked<std::shared_ptr<ome::files::out::OMETIFFWriter>, std::shared_lock<std::shared_mutex>>;
 
-        ome_read_write_tiff() = default;
+        ome_tiff_io() = default;
 
         /**
          * Opens an existing OME TIFF file
          * @param t_path
          */
-        explicit ome_read_write_tiff(boost::filesystem::path t_path) : m_path(std::move(t_path)) {
+        explicit ome_tiff_io(boost::filesystem::path t_path) : m_path(std::move(t_path)) {
             if (!boost::filesystem::is_regular_file(m_path)) {
                 throw std::runtime_error("Cannot read from non-existing file " + m_path.string());
             }
@@ -46,7 +48,7 @@ namespace misaxx_ome {
          * @param t_path
          * @param t_metadata
          */
-        explicit ome_read_write_tiff(boost::filesystem::path t_path,
+        explicit ome_tiff_io(boost::filesystem::path t_path,
                                      std::shared_ptr<ome::xml::meta::OMEXMLMetadata> t_metadata) : m_path(
                 std::move(t_path)), m_metadata(std::move(t_metadata)) {
             // We can load metadata from the file if it exists
@@ -60,8 +62,8 @@ namespace misaxx_ome {
          * @param t_path
          * @param t_reference
          */
-        explicit ome_read_write_tiff(boost::filesystem::path t_path, const ome_read_write_tiff &t_reference)
-                : ome_read_write_tiff(std::move(t_path), t_reference.get_metadata()) {
+        explicit ome_tiff_io(boost::filesystem::path t_path, const ome_tiff_io &t_reference)
+                : ome_tiff_io(std::move(t_path), t_reference.get_metadata()) {
         }
 
         void write_plane(const cv::Mat &image, const misa_ome_plane_location &index) {
@@ -140,6 +142,22 @@ namespace misaxx_ome {
                 open_writer();
                 wlock.unlock();
                 return get_writer();
+            }
+        }
+
+        /**
+         * Closes any open reader and writer. This method is thread-safe.
+         */
+        void close() {
+            std::unique_lock<std::shared_mutex> wlock(m_mutex, std::defer_lock);
+            wlock.lock();
+            if(static_cast<bool>(m_reader)) {
+                m_reader->close();
+                m_reader.reset();
+            }
+            if(static_cast<bool>(m_writer)) {
+                m_writer->close();
+                m_writer.reset();
             }
         }
 

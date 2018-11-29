@@ -19,7 +19,7 @@ add_library(misaxx_ome
         misaxx_ome/patterns/misa_ome_tiff_pattern.h
         misaxx_ome/descriptions/misa_ome_tiff_description.h
         misaxx_ome/io/opencv_to_ome.h
-        misaxx_ome/io/ome_read_write_tiff.h
+        misaxx_ome/io/ome_tiff_io.h
         misaxx_ome/descriptions/misa_ome_series_description.h
         misaxx_ome/io/json_ome_pixel_type.h
         misaxx_ome/helpers/ome_helpers.h

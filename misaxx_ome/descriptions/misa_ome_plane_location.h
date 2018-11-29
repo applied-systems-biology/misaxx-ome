@@ -173,7 +173,7 @@ namespace misaxx_ome {
         }
 
         friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_location &location) {
-            os << "s" << location.series << "z" << location.z << "c" << location.c << "t" << location.t;
+            os << "S" << location.series << "_Z" << location.z << "_C" << location.c << "_T" << location.t;
             return os;
         }
     };

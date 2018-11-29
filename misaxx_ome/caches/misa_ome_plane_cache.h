@@ -12,7 +12,7 @@
 #include <ome/files/in/OMETIFFReader.h>
 #include <misaxx/misa_default_cache.h>
 #include <misaxx_ome/io/ome_to_opencv.h>
-#include <misaxx_ome/io/ome_read_write_tiff.h>
+#include <misaxx_ome/io/ome_tiff_io.h>
 
 namespace misaxx_ome {
 
@@ -58,18 +58,18 @@ namespace misaxx_ome {
         void do_link(const misa_ome_plane_location &t_description) override {
             // Won't do anything, as we depend on the tiff_reader (and internal coordinates)
             if(!static_cast<bool>(m_tiff)) {
-                throw std::runtime_error("Cannot link OME TIFF plane without a TIFF reader/writer!");
+                throw std::runtime_error("Cannot link OME TIFF plane without a TIFF IO!");
             }
             set_unique_location(get_location() / "images" /  (cxxh::to_string(t_description) + ".tif"));
             std::cout << "[Cache] Linking OME TIFF plane @ " << t_description << std::endl;
         }
 
-        void set_tiff(std::shared_ptr<ome_read_write_tiff> t_tiff) {
+        void set_tiff(std::shared_ptr<ome_tiff_io> t_tiff) {
             m_tiff = std::move(t_tiff);
         }
 
     private:
-        std::shared_ptr<ome_read_write_tiff> m_tiff;
+        std::shared_ptr<ome_tiff_io> m_tiff;
         cv::Mat m_cached_image;
     };
 }
