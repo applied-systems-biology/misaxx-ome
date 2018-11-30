@@ -27,7 +27,7 @@ add_library(misaxx_ome
         misaxx_ome/accessors/misa_ome_plane.cpp
         misaxx_ome/accessors/misa_ome_plane.h
         misaxx_ome/accessors/misa_ome_tiff.cpp
-        misaxx_ome/accessors/misa_ome_tiff.h)
+        misaxx_ome/accessors/misa_ome_tiff.h misaxx_ome/io/ome_to_ome.h)
 
 target_link_libraries(misaxx_ome PUBLIC OME::Files)
 misa_module(misaxx_ome)
