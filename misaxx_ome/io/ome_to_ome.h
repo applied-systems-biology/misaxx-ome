@@ -45,7 +45,8 @@ namespace misaxx_ome {
         }
 
         VariantPixelBuffer write_vbuffer(write_buffer);
-        ome_writer.saveBytes(output_index.index_within(ome_writer), write_vbuffer);
+        const auto plane_index = output_index.index_within(ome_writer);
+        ome_writer.saveBytes(plane_index, write_vbuffer);
     }
 
     /**

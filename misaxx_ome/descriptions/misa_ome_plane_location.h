@@ -70,10 +70,10 @@ namespace misaxx_ome {
             return reader.getIndex(z, c, t);
         }
 
-        ome::files::dimension_size_type index_within(const ome::files::out::OMETIFFWriter &reader) const {
-            if(reader.getSeries() != series)
+        ome::files::dimension_size_type index_within(const ome::files::out::OMETIFFWriter &writer) const {
+            if(writer.getSeries() != series)
                 throw std::runtime_error("The reader must be located at the same series as the location description!");
-            return reader.getIndex(z, c, t);
+            return writer.getIndex(z, c, t);
         }
 
         void from_json(const nlohmann::json &t_json) override {
@@ -172,6 +172,22 @@ namespace misaxx_ome {
             return !(rhs == *this);
         }
 
+        bool operator<(const misa_ome_plane_location &rhs) const {
+            return series < rhs.series || z < rhs.z || c < rhs.c || t < rhs.t;
+        }
+
+        bool operator>(const misa_ome_plane_location &rhs) const {
+            return rhs < *this;
+        }
+
+        bool operator<=(const misa_ome_plane_location &rhs) const {
+            return !(rhs < *this);
+        }
+
+        bool operator>=(const misa_ome_plane_location &rhs) const {
+            return !(*this < rhs);
+        }
+
         friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_location &location) {
             os << "S" << location.series << "_Z" << location.z << "_C" << location.c << "_T" << location.t;
             return os;
@@ -185,4 +201,15 @@ namespace misaxx_ome {
     void from_json(const nlohmann::json& j, misa_ome_plane_location& p) {
         p.from_json(j);
     }
+}
+
+namespace std {
+    template <> struct hash<misaxx_ome::misa_ome_plane_location>
+    {
+        size_t operator()(const misaxx_ome::misa_ome_plane_location & x) const
+        {
+            const auto H = hash<ome::files::dimension_size_type>();
+            return H(x.series) + H(x.z) + H(x.c) + H(x.t);
+        }
+    };
 }

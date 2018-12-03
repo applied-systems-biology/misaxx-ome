@@ -19,27 +19,9 @@
 #include "ome_to_opencv.h"
 #include "opencv_to_ome.h"
 #include "ome_to_ome.h"
+#include <misaxx_ome/helpers/ome_helpers.h>
 
 namespace misaxx_ome {
-
-    /**
-    * Custom OMETIFFWriter that removes the sequential write check
-    */
-    struct non_sequential_ome_tiff_writer : public ome::files::out::OMETIFFWriter {
-        using OMETIFFWriter::OMETIFFWriter;
-
-        void setPlane(ome::files::dimension_size_type plane) const override {
-            const ome::files::dimension_size_type currentPlane = getPlane();
-
-            this->plane = plane;
-
-            if (currentPlane != plane)
-            {
-                nextIFD();
-                setupIFD();
-            }
-        }
-    };
 
     /**
      * Allows thread-safe read and write access to an OME TIFF
@@ -61,7 +43,6 @@ namespace misaxx_ome {
          * @param t_path
          */
         explicit ome_tiff_io(boost::filesystem::path t_path) : m_path(std::move(t_path)) {
-            m_buffer_path = m_path.parent_path() / (get_base_filename().string() + "_wbuffer.ome.tif");
             if (!boost::filesystem::is_regular_file(m_path)) {
                 throw std::runtime_error("Cannot read from non-existing file " + m_path.string());
             }
@@ -76,7 +57,6 @@ namespace misaxx_ome {
         explicit ome_tiff_io(boost::filesystem::path t_path,
                                      std::shared_ptr<ome::xml::meta::OMEXMLMetadata> t_metadata) : m_path(
                 std::move(t_path)), m_metadata(std::move(t_metadata)) {
-            m_buffer_path = m_path.parent_path() / (get_base_filename().string() + "_wbuffer.ome.tif");
             // We can load metadata from the file if it exists
             if (boost::filesystem::is_regular_file(m_path)) {
                 m_metadata.reset();
@@ -95,18 +75,15 @@ namespace misaxx_ome {
         void write_plane(const cv::Mat &image, const misa_ome_plane_location &index) {
             if(index.series != 0)
                 throw std::runtime_error("Only series 0 is currently supported!");
-            auto writer = get_writer();
-//            writer.value->setSeries(index.series); // TODO: Mutex
-            const auto writer_path = m_path.parent_path() / (get_base_filename().string() + "_" + cxxh::to_string(index) + ".ome.tif");
-            writer.value->changeOutputFile(writer_path);
-            opencv_to_ome(image, *writer.value, index);
+            auto writer = get_writer(index);
+            opencv_to_ome(image, *writer.value, misa_ome_plane_location(0, 0, 0, 0));
+            writer.value->close();
         }
 
         cv::Mat read_plane(const misa_ome_plane_location &index) const {
             if(index.series != 0)
                 throw std::runtime_error("Only series 0 is currently supported!");
             auto reader = get_reader();
-//            reader.value->setSeries(index.series); // TODO: Mutex
             return ome_to_opencv(*reader.value, index);
         }
 
@@ -143,9 +120,8 @@ namespace misaxx_ome {
                 lock.unlock();
                 std::unique_lock<std::shared_mutex> wlock(m_mutex, std::defer_lock);
                 wlock.lock();
-                if(static_cast<bool>(m_writer)) {
-                    m_writer->close();
-                    m_writer.reset();
+                if(!m_write_buffer.empty()) {
+                    close_writer();
                 }
                 open_reader();
                 wlock.unlock();
@@ -157,6 +133,31 @@ namespace misaxx_ome {
         }
 
         /**
+        * Thread-safe access to the managed writer
+        * The writer is unique-locked (sequential access!)
+        * @return
+        */
+        locked_writer_type get_writer(const misa_ome_plane_location &t_location) const {
+            std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
+            lock.lock();
+
+            // If the current TIFF file exists, set it to a reader->writer connection
+            // This will preserve the TIFF data that is already written
+            if(boost::filesystem::is_regular_file(m_path) && m_write_buffer.empty()) {
+                if(!static_cast<bool>(m_reader)) {
+                    open_reader();
+                }
+            }
+
+            if(static_cast<bool>(m_reader)) {
+                 initialize_write_buffer_from_reader();
+                 close_reader();
+            }
+
+            return locked_writer_type(get_buffer_writer(t_location), std::move(lock));
+        }
+
+        /**
          * Closes any open reader and writer. This method is thread-safe.
          */
         void close() {
@@ -165,7 +166,7 @@ namespace misaxx_ome {
             if(static_cast<bool>(m_reader)) {
                 close_reader();
             }
-            if(static_cast<bool>(m_writer)) {
+            if(!m_write_buffer.empty()) {
                 close_writer();
             }
         }
@@ -198,32 +199,24 @@ namespace misaxx_ome {
             return get_size_c(series) * get_size_t(series) * get_size_z(series);
         }
 
-    protected:
+    private:
 
         /**
-        * Thread-safe access to the managed writer
-        * The writer is unique-locked (sequential access!)
-        * @return
-        */
-        locked_writer_type get_writer() const {
-            std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
-            lock.lock();
-            if(static_cast<bool>(m_writer)) {
-                return locked_writer_type(m_writer, std::move(lock));
-            }
-            else {
+         * Path of the TIFF that is read / written
+         */
+        mutable boost::filesystem::path m_path;
 
-                // If the current TIFF file exists, set it to a reader->writer connection
-                // This will preserve the TIFF data that is already written
-                if(boost::filesystem::is_regular_file(m_path)) {
-                    if(!static_cast<bool>(m_reader)) {
-                        open_reader();
-                    }
-                }
+        /**
+         * Because of limitations to OMETIFFWriter, we buffer any output TIFF in a separate directory
+         */
+        mutable std::map<misa_ome_plane_location, boost::filesystem::path> m_write_buffer;
 
-                open_writer();
-                return locked_writer_type(m_writer, std::move(lock));
-            }
+        mutable std::shared_ptr<ome::files::in::OMETIFFReader> m_reader;
+        mutable std::shared_ptr<ome::xml::meta::OMEXMLMetadata> m_metadata;
+        mutable std::shared_mutex m_mutex;
+
+        size_t get_image_index(const misa_ome_plane_location &t_location) const {
+            return 0; //TODO
         }
 
         /**
@@ -237,20 +230,6 @@ namespace misaxx_ome {
             }
             return base_name;
         }
-
-    private:
-        /**
-         * Path of the TIFF that is read / written
-         */
-        mutable boost::filesystem::path m_path;
-        /**
-         * Buffer TIFF file if a reader is switched to a writer
-         */
-        mutable boost::filesystem::path m_buffer_path;
-        mutable std::shared_ptr<ome::files::out::OMETIFFWriter> m_writer;
-        mutable std::shared_ptr<ome::files::in::OMETIFFReader> m_reader;
-        mutable std::shared_ptr<ome::xml::meta::OMEXMLMetadata> m_metadata;
-        mutable std::shared_mutex m_mutex;
 
         void open_reader() const {
             m_reader = std::make_shared<ome::files::in::OMETIFFReader>();
@@ -268,47 +247,76 @@ namespace misaxx_ome {
             m_reader.reset();
         }
 
-        void open_writer() const {
-            if(!static_cast<bool>(m_metadata)) {
-                throw std::runtime_error("Cannot write to OME TIFF " + m_path.string() + " without necessary metadata!");
-            }
-            auto metadata = std::static_pointer_cast<ome::xml::meta::MetadataRetrieve>(m_metadata);
-            m_writer = std::make_shared<non_sequential_ome_tiff_writer>(); // Initialize a non-sequential TIFF writer
-            m_writer->setMetadataRetrieve(metadata);
-            m_writer->setInterleaved(false);
-            m_writer->setWriteSequentially(false);
-
-            // If the existing write target already exists, use the buffer path instead
-            if(boost::filesystem::is_regular_file(m_path)) {
-                std::swap(m_path, m_buffer_path);
-            }
-
-            m_writer->setId(m_path);
-
-            if(static_cast<bool>(m_reader)) {
-                // We need to copy the data from reader to writer (to preserve it)
-                write_all_tiffs();
-                close_reader();
-            }
-        }
-
         void close_writer() const {
-            if(boost::filesystem::is_regular_file(m_buffer_path)) {
-                // Switch to the write buffer
-                std::swap(m_path, m_buffer_path);
+            std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << std::endl;
+            // Save the write buffer files into the path
+            auto writer = std::make_shared<ome::files::out::OMETIFFWriter>();
+            auto metadata = std::static_pointer_cast<ome::xml::meta::MetadataRetrieve>(m_metadata);
+            writer->setMetadataRetrieve(metadata);
+            writer->setInterleaved(false);
+            writer->setId(m_path);
+
+            auto reader = std::make_shared<ome::files::in::OMETIFFReader>();
+            reader->setMetadataFiltered(false);
+            reader->setGroupFiles(true);
+
+            for(const auto &kv : m_write_buffer) {
+                std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << kv.first << std::endl;
+                reader->setId(kv.second);
+                ome_to_ome(*reader, misa_ome_plane_location(0, 0, 0, 0), *writer, kv.first);
             }
+
+            reader->close();
+            writer->close();
+            m_write_buffer.clear();
         }
 
         /**
-         * Copies all TIFF data from the reader to the writer
+         * Returns the write buffer path for a location
+         * @param t_location
+         * @return
          */
-        void write_all_tiffs() const {
-            std::cout << "[MISA++ OME] Switching " << m_path << " from read to write mode ... " << std::endl;
+        boost::filesystem::path get_write_buffer_path(const misa_ome_plane_location &t_location) const {
+            return m_path.parent_path() / "__misa_ome_write_buffer__" / (m_path.filename().string() + "_" + cxxh::to_string(t_location) + ".ome.tif");
+        }
 
+        /**
+         * Returns the OME TIFF writer for a write buffer
+         * @param t_location
+         * @return
+         */
+        std::shared_ptr<ome::files::out::OMETIFFWriter> get_buffer_writer(const misa_ome_plane_location &t_location) const {
+            const auto size_X = m_metadata->getPixelsSizeX(t_location.series);
+            const auto size_Y = m_metadata->getPixelsSizeY(t_location.series);
+            const std::vector<size_t> channels = { m_metadata->getChannelCount(get_image_index(t_location)) };
+
+            // Create a new writer with only 1 plane
+            auto writer = std::make_shared<ome::files::out::OMETIFFWriter>();
+            auto metadata = helpers::create_ome_xml_metadata(size_X, size_Y, 1, 1, channels, m_metadata->getPixelsType(get_image_index(t_location)));
+            auto metadata_retrieve = std::static_pointer_cast<ome::xml::meta::MetadataRetrieve>(metadata);
+            writer->setMetadataRetrieve(metadata_retrieve);
+            writer->setInterleaved(false);
+
+            // Change the writer path
+            const auto buffer_path = get_write_buffer_path(t_location);
+            if(!boost::filesystem::is_directory(buffer_path.parent_path())) {
+                boost::filesystem::create_directories(buffer_path.parent_path());
+            }
+            writer->setId(buffer_path);
+
+            // Store it into the buffer
+            m_write_buffer.insert({ t_location, buffer_path});
+
+            return writer;
+        }
+
+       /**
+        * Copies all TIFF images stored inside the current reader into the buffer directory
+        */
+        void initialize_write_buffer_from_reader() const {
+            std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... " << std::endl;
             for(size_t series = 0; series < get_num_series(); ++series) {
                 m_reader->setSeries(series);
-                m_writer->setSeries(series);
-
                 const auto size_Z = m_reader->getSizeZ();
                 const auto size_C = m_reader->getSizeC();
                 const auto size_T = m_reader->getSizeT();
@@ -316,15 +324,13 @@ namespace misaxx_ome {
                 for(size_t z = 0; z < size_Z; ++z) {
                     for(size_t c = 0; c < size_C; ++c) {
                         for (size_t t = 0; t < size_T; ++t) {
-                            const auto location_name = cxxh::to_string(misa_ome_plane_location(series, z, c, t));
-                            std::cout << "[MISA++ OME] Switching " << m_path << " from read to write mode ... " << location_name << std::endl;
+                            const misa_ome_plane_location location(series, z, c, t);
+                            const auto location_name = cxxh::to_string(location);
+                            std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << std::endl;
 
-                            // Change the writer path
-                            const auto writer_path = m_path.parent_path() / (get_base_filename().string() + "_" + location_name + ".ome.tif");
-                            m_writer->changeOutputFile(writer_path);
-
-                            // Copy via variant pixel buffer
-                            ome_to_ome(*m_reader, misa_ome_plane_location(series, z, c, t), *m_writer, misa_ome_plane_location(series, z, c, t));
+                            auto writer = get_buffer_writer(location);
+                            ome_to_ome(*m_reader, misa_ome_plane_location(series, z, c, t), *writer, misa_ome_plane_location(0, 0, 0, 0));
+                            writer->close();
                         }
                     }
                 }
