@@ -55,12 +55,12 @@ namespace misaxx_ome {
             m_series = series;
 
             if(m_data->series.empty()) {
-                for(size_t i = 0; i <= series; ++series) {
+                for(size_t i = 0; i <= series; ++i) {
                     m_data->series.emplace_back(misa_ome_series_description());
                 }
             }
             else {
-                for(size_t i = m_data->series.size() - 1; i <= series; ++series) {
+                for(size_t i = m_data->series.size() - 1; i < series; ++i) {
                     m_data->series.emplace_back(misa_ome_series_description());
                 }
             }

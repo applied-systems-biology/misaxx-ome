@@ -171,30 +171,64 @@ namespace misaxx_ome {
             }
         }
 
+        /**
+         * The number of image series
+         * @return
+         */
         ome::files::dimension_size_type get_num_series() const {
             return get_metadata()->getImageCount();
         }
 
+        /**
+         * The width of each plane
+         * @param series
+         * @return
+         */
         ome::files::dimension_size_type get_size_x(ome::files::dimension_size_type series) const {
             return get_metadata()->getPixelsSizeX(series);
         }
 
+        /**
+         * The height of each plane
+         * @param series
+         * @return
+         */
         ome::files::dimension_size_type get_size_y(ome::files::dimension_size_type series) const {
             return get_metadata()->getPixelsSizeY(series);
         }
 
+        /**
+         * Planes located in depth axis
+         * @param series
+         * @return
+         */
         ome::files::dimension_size_type get_size_z(ome::files::dimension_size_type series) const {
             return get_metadata()->getPixelsSizeZ(series);
         }
 
+        /**
+         * Planes located in time axis
+         * @param series
+         * @return
+         */
         ome::files::dimension_size_type get_size_t(ome::files::dimension_size_type series) const {
             return get_metadata()->getPixelsSizeT(series);
         }
 
+        /**
+         * Planes located in channel axis (this is the same as OME's effectiveSizeC)
+         * @param series
+         * @return
+         */
         ome::files::dimension_size_type get_size_c(ome::files::dimension_size_type series) const {
-            return get_metadata()->getPixelsSizeC(series);
+            return get_metadata()->getChannelCount(series);
         }
 
+        /**
+         * Number of planes (Z * C * T)
+         * @param series
+         * @return
+         */
         ome::files::dimension_size_type get_num_planes(ome::files::dimension_size_type series) const {
             return get_size_c(series) * get_size_t(series) * get_size_z(series);
         }
@@ -214,10 +248,6 @@ namespace misaxx_ome {
         mutable std::shared_ptr<ome::files::in::OMETIFFReader> m_reader;
         mutable std::shared_ptr<ome::xml::meta::OMEXMLMetadata> m_metadata;
         mutable std::shared_mutex m_mutex;
-
-        size_t get_image_index(const misa_ome_plane_location &t_location) const {
-            return 0; //TODO
-        }
 
         /**
          * Returns the filename of the path without .ome.tif extension
@@ -288,11 +318,11 @@ namespace misaxx_ome {
         std::shared_ptr<ome::files::out::OMETIFFWriter> get_buffer_writer(const misa_ome_plane_location &t_location) const {
             const auto size_X = m_metadata->getPixelsSizeX(t_location.series);
             const auto size_Y = m_metadata->getPixelsSizeY(t_location.series);
-            const std::vector<size_t> channels = { m_metadata->getChannelCount(get_image_index(t_location)) };
+            const std::vector<size_t> channels = { static_cast<size_t>(m_metadata->getChannelSamplesPerPixel(t_location.series, t_location.c)) };
 
             // Create a new writer with only 1 plane
             auto writer = std::make_shared<ome::files::out::OMETIFFWriter>();
-            auto metadata = helpers::create_ome_xml_metadata(size_X, size_Y, 1, 1, channels, m_metadata->getPixelsType(get_image_index(t_location)));
+            auto metadata = helpers::create_ome_xml_metadata(size_X, size_Y, 1, 1, channels, m_metadata->getPixelsType(t_location.series));
             auto metadata_retrieve = std::static_pointer_cast<ome::xml::meta::MetadataRetrieve>(metadata);
             writer->setMetadataRetrieve(metadata_retrieve);
             writer->setInterleaved(false);

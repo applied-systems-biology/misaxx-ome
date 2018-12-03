@@ -24,6 +24,7 @@
 #include <iostream>
 #include <misaxx_ome/io/ome_tiff_io.h>
 #include <misaxx_ome/accessors/misa_ome_tiff.h>
+#include <coixx/toolbox/toolbox_channels.h>
 
 using namespace misaxx;
 using namespace misaxx_ome;
@@ -46,10 +47,17 @@ struct misa_ome_test : public misa_module<misa_ome_test_declaration> {
     void misa_init() override {
         for(size_t i = 0; i < tiff.size(); ++i) {
             std::cout << tiff.at(i).get_data_description() << std::endl;
-            auto read_access = tiff.at(i).access_readonly();
-            auto write_access = out_tiff.at(i).access_write();
 
-            write_access.set(read_access.get());
+            coixx::images::grayscale8u input(tiff.at(i).clone());
+            coixx::images::grayscale8u black(input.get_size(), coixx::colors::grayscale8u::black());
+
+            auto rgb = coixx::toolbox::channels::merge<coixx::images::bgr8u>(input, black, black);
+            out_tiff.at(i).write(rgb.get_image());
+
+//            auto read_access = tiff.at(i).access_readonly();
+//            auto write_access = out_tiff.at(i).access_write();
+//
+//            write_access.set(read_access.get());
         }
     }
 };
