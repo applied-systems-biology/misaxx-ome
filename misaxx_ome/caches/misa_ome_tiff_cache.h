@@ -83,7 +83,7 @@ namespace misaxx_ome {
                         for(size_t t = 0; t < size_T; ++t) {
                             misa_ome_plane cache;
                             cache.data = std::make_shared<misa_ome_plane_cache>();
-                            cache.data->set_tiff(m_tiff);
+                            cache.data->set_tiff_io(m_tiff);
                             cache.force_link(get_location(), misaxx::misa_description_storage::with(misa_ome_plane_location(series, z, c, t)));
                             get().emplace_back(std::move(cache));
                         }

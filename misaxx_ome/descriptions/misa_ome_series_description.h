@@ -22,22 +22,22 @@ namespace misaxx_ome {
         /**
          * Width of a plane in this series
          */
-        int size_X = 0;
+        size_t size_X = 0;
 
         /**
          * Height of a plane in this series
          */
-        int size_Y = 0;
+        size_t size_Y = 0;
 
         /**
          * Number of planes allocated in Z-axis (depth)
          */
-        int size_Z = 0;
+        size_t size_Z = 0;
 
         /**
          * Number of planes allocated in the time-axis
          */
-        int size_T = 0;
+        size_t size_T = 0;
 
         /**
          * The size of this vector is the number of planes allocated in the channel-axis

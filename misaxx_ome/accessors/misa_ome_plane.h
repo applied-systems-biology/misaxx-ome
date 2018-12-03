@@ -31,6 +31,32 @@ namespace misaxx_ome {
         void write(cv::Mat t_data) {
             this->access_write().set(std::move(t_data));
         }
+
+        /**
+         * Returns the location of this plane within the TIFF file
+         * @return
+         */
+        const misa_ome_plane_location &get_plane_location() const {
+            return this->data->get_plane_location();
+        }
+
+        /**
+         * Width of this plane
+         * @param series
+         * @return
+         */
+        size_t get_size_x() const {
+            return this->data->get_tiff_io()->get_size_x(get_plane_location().series);
+        }
+
+        /**
+         * Height of this plane
+         * @param series
+         * @return
+         */
+        size_t get_size_y() const {
+            return this->data->get_tiff_io()->get_size_y(get_plane_location().series);
+        }
     };
 }
 

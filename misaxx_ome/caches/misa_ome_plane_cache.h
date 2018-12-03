@@ -42,7 +42,7 @@ namespace misaxx_ome {
         }
 
         void pull() override {
-            m_cached_image = m_tiff->read_plane(describe()->get<misa_ome_plane_location>());
+            m_cached_image = m_tiff->read_plane(get_plane_location());
         }
 
         void stash() override {
@@ -52,7 +52,7 @@ namespace misaxx_ome {
         void push() override {
             if(m_cached_image.empty())
                 throw std::runtime_error("Trying to write empty image to TIFF!");
-            m_tiff->write_plane(m_cached_image, describe()->get<misa_ome_plane_location>());
+            m_tiff->write_plane(m_cached_image, get_plane_location());
         }
 
         void do_link(const misa_ome_plane_location &t_description) override {
@@ -60,12 +60,20 @@ namespace misaxx_ome {
             if(!static_cast<bool>(m_tiff)) {
                 throw std::runtime_error("Cannot link OME TIFF plane without a TIFF IO!");
             }
-            set_unique_location(get_location() / "images" /  (cxxh::to_string(t_description) + ".tif"));
+            set_unique_location(get_location() / "planes" /  (cxxh::to_string(t_description) + ".tif"));
             std::cout << "[Cache] Linking OME TIFF plane @ " << t_description << std::endl;
         }
 
-        void set_tiff(std::shared_ptr<ome_tiff_io> t_tiff) {
+        void set_tiff_io(std::shared_ptr<ome_tiff_io> t_tiff) {
             m_tiff = std::move(t_tiff);
+        }
+
+        std::shared_ptr<ome_tiff_io> get_tiff_io() const {
+            return m_tiff;
+        }
+
+        const misa_ome_plane_location &get_plane_location() const {
+            return describe()->get<misa_ome_plane_location>();
         }
 
     private:

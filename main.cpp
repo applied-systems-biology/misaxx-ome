@@ -31,13 +31,12 @@ using namespace ome::files;
 using namespace ome::files::tiff;
 
 struct misa_ome_test_declaration : public misa_module_declaration {
-
     misa_ome_tiff tiff;
     misa_ome_tiff out_tiff;
 
     void init_data() override {
         tiff.suggest_import_location(filesystem, "/");
-        out_tiff.suggest_export_location(filesystem, "out_tiff", tiff.describe());
+        out_tiff.suggest_export_location(filesystem, "out_tiff", tiff.builder().as_storage());
     }
 };
 
