@@ -114,7 +114,7 @@ namespace misaxx_ome {
 
             // Calculate the plane index
             size_t start_index = 0;
-            for(size_t series = 0; series < num_series; ++series) {
+            for(size_t series = 0; series < t_location.series; ++series) {
                 start_index += m_tiff->get_num_planes(series);
             }
 
