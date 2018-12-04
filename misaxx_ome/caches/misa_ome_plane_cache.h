@@ -36,7 +36,12 @@ namespace misaxx_ome {
         }
 
         bool has() const override {
-            return !m_cached_image.empty();
+            if constexpr (std::is_same<Image, cv::Mat>::value) {
+                return !m_cached_image.empty();
+            }
+            else {
+                return !m_cached_image.is_empty();
+            }
         }
 
         bool can_pull() const override {
