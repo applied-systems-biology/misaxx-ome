@@ -348,7 +348,7 @@ namespace misaxx_ome {
             for(size_t series = 0; series < get_num_series(); ++series) {
                 m_reader->setSeries(series);
                 const auto size_Z = m_reader->getSizeZ();
-                const auto size_C = m_reader->getSizeC();
+                const auto size_C = m_reader->getEffectiveSizeC();
                 const auto size_T = m_reader->getSizeT();
 
                 for(size_t z = 0; z < size_Z; ++z) {

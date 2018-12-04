@@ -59,7 +59,7 @@ namespace misaxx_ome {
         
         int size_x = static_cast<int>(ome_reader.getSizeX());
         int size_y = static_cast<int>(ome_reader.getSizeY());
-        int channels = static_cast<int>(ome_reader.getSizeC());
+        int channels = static_cast<int>(ome_reader.getRGBChannelCount(index.c));
 
         ome::files::VariantPixelBuffer ome_buffer;
         ome_reader.openBytes(index.index_within(ome_reader), ome_buffer);

@@ -101,66 +101,6 @@ namespace misaxx_ome {
             return misaxx::misa_serialization_id("misa_ome", "ome-image-location");
         }
 
-        /**
-         * Increments this location by 1 using the result returned by misa_ome_plane_location_description::get_end
-         * Please note that this will not increment the series counter
-         * @param t_end
-         * @return
-         */
-        misa_ome_plane_location &increment_in_series(const misa_ome_plane_location &t_end) {
-            if(z < t_end.z - 1) {
-                ++z;
-            }
-            else {
-                z = 0;
-                if(c < t_end.c - 1) {
-                    ++c;
-                }
-                else {
-                    c = 0;
-
-                    if(t < t_end.t - 1) {
-                        ++t;
-                    }
-                    else {
-                        *this = t_end;
-                    }
-                }
-            }
-            return *this;
-        }
-
-        /**
-         * Returns a locations that consists of the respective sizes
-         * @param reader
-         * @return
-         */
-        static misa_ome_plane_location get_end(const ome::files::FormatReader &reader, ome::files::dimension_size_type series) {
-            if(reader.getSeries() != series)
-                throw std::runtime_error("The reader must work on the same series as requested!");
-            return misa_ome_plane_location(series, reader.getSizeZ(), reader.getSizeC(), reader.getSizeT());
-        }
-
-        /**
-        * Returns a locations that consists of the respective sizes
-        * @param reader
-        * @return
-        */
-        static misa_ome_plane_location get_end(const ome::files::out::OMETIFFWriter &writer, ome::files::dimension_size_type series) {
-            if(writer.getSeries() != series)
-                throw std::runtime_error("The writer must work on the same series as requested!");
-            return misa_ome_plane_location(series, writer.getSizeZ(), writer.getSizeC(), writer.getSizeT());
-        }
-
-        /**
-       * Returns a locations that consists of the respective sizes
-       * @param reader
-       * @return
-       */
-        static misa_ome_plane_location get_end(const ome::xml::meta::OMEXMLMetadata &xml, ome::files::dimension_size_type series) {
-            return misa_ome_plane_location(series, xml.getPixelsSizeZ(series), xml.getPixelsSizeC(series), xml.getPixelsSizeT(series));
-        }
-
         bool operator==(const misa_ome_plane_location &rhs) const {
             return series == rhs.series &&
                    z == rhs.z &&

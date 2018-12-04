@@ -20,7 +20,7 @@ namespace misaxx_ome {
 
         const auto size_x = ome_reader.getSizeX();
         const auto size_y = ome_reader.getSizeY();
-        const auto channels = ome_reader.getSizeC();
+        const auto channels = ome_reader.getRGBChannelCount(input_index.c);
         auto write_buffer = std::make_shared<PixelBuffer<typename PixelProperties<OMEPixelType>::std_type>> (boost::extents[size_x][size_y][1][1][1][channels][1][1][1],
                                                                                                        ome_reader.getPixelType(),
                                                                                                        ome::files::ENDIAN_NATIVE,
