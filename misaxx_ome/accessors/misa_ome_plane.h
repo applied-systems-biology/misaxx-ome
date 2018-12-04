@@ -20,7 +20,7 @@ namespace misaxx_ome {
          * Clones the image stored in this OME TIFF plane
          * @return
          */
-        cv::Mat clone() {
+        Image clone() {
             return this->access_readonly().get().clone();
         }
 
@@ -29,7 +29,7 @@ namespace misaxx_ome {
          * @param t_cache
          * @param t_data
          */
-        void write(cv::Mat t_data) {
+        void write(Image t_data) {
             this->access_write().set(std::move(t_data));
         }
 
