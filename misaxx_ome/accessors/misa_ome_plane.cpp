@@ -3,3 +3,5 @@
 //
 
 #include "misa_ome_plane.h"
+
+template struct misaxx_ome::misa_ome_plane<cv::Mat>;

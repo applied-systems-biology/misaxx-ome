@@ -17,30 +17,26 @@
 namespace misaxx_ome {
 
     /**
-     * List of planes that are stored within an OME TIFF
-     */
-    using misa_ome_tiff_planes_t = std::vector<misa_ome_plane>;
-
-    /**
      * Cache that allows read and write access to an OME TIFF
+     * @tparam Image cv::Mat or a coixx::image
      */
-    class misa_ome_tiff_cache : public misaxx::misa_default_cache<cxxh::memory_cache<misa_ome_tiff_planes_t>,
+    template<class Image = cv::Mat> class misa_ome_tiff_cache : public misaxx::misa_default_cache<cxxh::memory_cache<std::vector<misa_ome_plane<Image>>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description> {
     public:
 
         void do_link(const misa_ome_tiff_description &t_description) override {
             // We do cache initialization during linkage
-            set_unique_location(get_location() / t_description.filename);
+            this->set_unique_location(this->get_location() / t_description.filename);
 
             bool write_description;
 
-            if(boost::filesystem::is_regular_file(get_unique_location())) {
-                std::cout << "[Cache] Opening OME TIFF " << get_unique_location() << std::endl;
-                m_tiff = std::make_shared<ome_tiff_io>(get_unique_location());
+            if(boost::filesystem::is_regular_file(this->get_unique_location())) {
+                std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << std::endl;
+                m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location());
                 write_description = true;
             }
             else {
-                std::cout << "[Cache] Creating OME TIFF " << get_unique_location() << std::endl;
+                std::cout << "[Cache] Creating OME TIFF " << this->get_unique_location() << std::endl;
 
                 // Generate from the description
                 if(t_description.series.empty())
@@ -63,12 +59,12 @@ namespace misaxx_ome {
                 }
 
                 // Create the TIFF and generate the image caches
-                m_tiff = std::make_shared<ome_tiff_io>(get_unique_location(), meta);
+                m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location(), meta);
                 write_description = false;
             }
 
             // Create the plane caches
-            auto &description = describe()->access<misa_ome_tiff_description>();
+            auto &description = this->describe()->template access<misa_ome_tiff_description>();
             for(size_t series = 0; series < m_tiff->get_num_series(); ++series) {
                 // For loaded files, write the series into the description
                 if(write_description)
@@ -82,10 +78,10 @@ namespace misaxx_ome {
                     for(size_t c = 0; c < size_C; ++c) {
                         for(size_t t = 0; t < size_T; ++t) {
                             misa_ome_plane cache;
-                            cache.data = std::make_shared<misa_ome_plane_cache>();
+                            cache.data = std::make_shared<misa_ome_plane_cache<Image>>();
                             cache.data->set_tiff_io(m_tiff);
-                            cache.force_link(get_location(), misaxx::misa_description_storage::with(misa_ome_plane_location(series, z, c, t)));
-                            get().emplace_back(std::move(cache));
+                            cache.force_link(this->get_location(), misaxx::misa_description_storage::with(misa_ome_plane_location(series, z, c, t)));
+                            this->get().emplace_back(std::move(cache));
                         }
                     }
                 }
@@ -105,12 +101,12 @@ namespace misaxx_ome {
         }
 
         /**
-         * Returns the plane cache from a plance location
+         * Returns the plane cache from a plane location
          * @param t_cache
          * @param t_location
          * @return
          */
-        misa_ome_plane get_plane(const misa_ome_plane_location &t_location) const {
+        misa_ome_plane<Image> get_plane(const misa_ome_plane_location &t_location) const {
             const auto num_series = m_tiff->get_num_series();
             const auto size_Z = m_tiff->get_size_z(t_location.series);
             const auto size_C = m_tiff->get_size_c(t_location.series);
@@ -123,11 +119,12 @@ namespace misaxx_ome {
             }
 
             size_t index = start_index + t_location.t + t_location.c * size_T + t_location.z * size_T * size_C;
-            return get().at(index);
+            return this->get().at(index);
         }
 
         void postprocess() override {
-            misa_cache::postprocess();
+            misaxx::misa_default_cache<cxxh::memory_cache<std::vector<misa_ome_plane<Image>>>,
+                    misa_ome_tiff_pattern, misa_ome_tiff_description>::postprocess();
             // Close the TIFF
             m_tiff->close();
         }

@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include <misaxx_ome/caches/misa_ome_tiff_cache.h>
 #include <misaxx/misa_cached_data.h>
 #include <misaxx_ome/helpers/misa_ome_tiff_description_builder.h>
@@ -12,12 +13,13 @@ namespace misaxx_ome {
      * An OME TIFF file that contains a list of 2D image planes.
      * The planes can be accessed via their index within this structure or using a misa_ome_plane_location
      * that also encodes semantic location within a time/depth/channel space.
+     * @tparam Image cv::Mat or a coixx::image
      */
-struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache>,
-                       public misaxx::misa_description_accessors_from_cache<misa_ome_tiff_cache, misa_ome_tiff> {
+    template<class Image = cv::Mat> struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache<Image>>,
+                           public misaxx::misa_description_accessors_from_cache<misa_ome_tiff_cache<Image>, misa_ome_tiff<Image>> {
 
-        using iterator = typename misa_ome_tiff_planes_t ::iterator;
-        using const_iterator = typename misa_ome_tiff_planes_t::const_iterator;
+        using iterator = typename std::vector<misa_ome_plane<Image>>::iterator;
+        using const_iterator = typename std::vector<misa_ome_plane<Image>>::const_iterator;
 
         iterator begin() {
             return this->data->get().begin();
@@ -43,11 +45,11 @@ struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache>,
             return this->data->get().empty();
         }
 
-        misa_ome_plane at(size_t index) const {
+        misa_ome_plane<Image> at(size_t index) const {
             return this->data->get().at(index);
         }
 
-        misa_ome_plane at(const misa_ome_plane_location &index) {
+        misa_ome_plane<Image> at(const misa_ome_plane_location &index) {
             return this->data->get_plane(index);
         }
 
@@ -103,7 +105,8 @@ struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache>,
          * @return
          */
         misa_ome_tiff_description_builder builder() const {
-            return misa_ome_tiff_description_builder(std::make_shared<misa_ome_tiff_description>(get_data_description()));
+            return misa_ome_tiff_description_builder(
+                    std::make_shared<misa_ome_tiff_description>(this->get_data_description()));
         }
 
         /**
