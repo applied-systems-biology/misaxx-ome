@@ -77,7 +77,7 @@ namespace misaxx_ome {
                 for(size_t z = 0; z < size_Z; ++z) {
                     for(size_t c = 0; c < size_C; ++c) {
                         for(size_t t = 0; t < size_T; ++t) {
-                            misa_ome_plane cache;
+                            misa_ome_plane<Image> cache;
                             cache.data = std::make_shared<misa_ome_plane_cache<Image>>();
                             cache.data->set_tiff_io(m_tiff);
                             cache.force_link(this->get_location(), misaxx::misa_description_storage::with(misa_ome_plane_location(series, z, c, t)));
