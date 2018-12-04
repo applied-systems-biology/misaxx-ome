@@ -105,6 +105,14 @@ struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache>,
         misa_ome_tiff_description_builder builder() const {
             return misa_ome_tiff_description_builder(std::make_shared<misa_ome_tiff_description>(get_data_description()));
         }
+
+        /**
+         * Returns the OME TIFF metadata storage
+         * @return
+         */
+        std::shared_ptr<ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const {
+            return this->data->get_tiff_io()->get_metadata();
+        }
     };
 }
 

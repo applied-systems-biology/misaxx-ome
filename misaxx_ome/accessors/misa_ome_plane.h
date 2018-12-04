@@ -57,6 +57,14 @@ namespace misaxx_ome {
         size_t get_size_y() const {
             return this->data->get_tiff_io()->get_size_y(get_plane_location().series);
         }
+
+        /**
+         * Returns the OME TIFF metadata storage
+         * @return
+         */
+        std::shared_ptr<ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const {
+            return this->data->get_tiff_io()->get_metadata();
+        }
     };
 }
 

@@ -72,6 +72,10 @@ namespace misaxx_ome {
             return m_tiff;
         }
 
+        /**
+         * Gets the location within the OME TIFF
+         * @return
+         */
         const misa_ome_plane_location &get_plane_location() const {
             return describe()->get<misa_ome_plane_location>();
         }
