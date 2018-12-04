@@ -20,7 +20,7 @@ namespace misaxx_ome {
          * Clones the image stored in this OME TIFF plane
          * @return
          */
-        Image clone() {
+        Image clone() const {
             return this->access_readonly().get().clone();
         }
 
