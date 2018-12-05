@@ -21,7 +21,8 @@ namespace misaxx_ome {
     * @tparam T the type that measures the unit
     * @tparam Unit the unit type
     */
-    template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_scalar<ome::xml::model::primitives::Quantity<Unit, T>> {
+template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_scalar<ome::xml::model::primitives::Quantity<Unit, T>>,
+        misaxx::scalar_operators<misa_ome_quantity<T, Unit>, T> {
 
         using value_type = ome::xml::model::primitives::Quantity<Unit, T>;
 
@@ -78,6 +79,34 @@ namespace misaxx_ome {
          */
         void set_value(T value) {
             value = value_type (std::move(value), get_unit());
+        }
+
+        bool operator==(const misa_ome_quantity<T, Unit> &rhs) const {
+            return this->value == rhs.value;
+        }
+
+        bool operator<(const misa_ome_quantity<T, Unit> &rhs) const {
+            return this->value < rhs.value;
+        }
+
+        misa_ome_quantity<T, Unit>& operator+=(const misa_ome_quantity<T, Unit>& rhs) {
+            this->value += rhs.value;
+            return *this;
+        }
+
+        misa_ome_quantity<T, Unit>& operator-=(const misa_ome_quantity<T, Unit>& rhs) {
+            this->value -= rhs.value;
+            return *this;
+        }
+
+        misa_ome_quantity<T, Unit>& operator*=(const misa_ome_quantity<T, Unit>& rhs) {
+            this->value *= rhs.value;
+            return *this;
+        }
+
+        misa_ome_quantity<T, Unit>& operator/=(const misa_ome_quantity<T, Unit>& rhs) {
+            this->value /= rhs.value;
+            return *this;
         }
     };
 
