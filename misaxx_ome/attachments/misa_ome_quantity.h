@@ -23,6 +23,18 @@ namespace misaxx_ome {
     */
     template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_scalar<ome::xml::model::primitives::Quantity<Unit, T>> {
 
+        using value_type = ome::xml::model::primitives::Quantity<Unit, T>;
+
+        misa_ome_quantity() = default;
+
+        explicit misa_ome_quantity(value_type value) : misaxx::misa_scalar<value_type>(std::move(value)) {
+
+        }
+
+        explicit misa_ome_quantity(T v, Unit u) : misaxx::misa_scalar<value_type>(value_type(v, u)) {
+
+        }
+
         void from_json(const nlohmann::json &t_json) override {
             const auto u = Unit::values().at(t_json["unit"]);
             const T v = t_json["value"].get<T>();
