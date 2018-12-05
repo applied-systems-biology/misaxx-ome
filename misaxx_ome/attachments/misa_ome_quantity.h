@@ -37,7 +37,7 @@ template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_
         /**
          * Unit enum
          */
-        using unity_type = Unit;
+        using unit_type = Unit;
 
         misa_ome_quantity() = default;
 
