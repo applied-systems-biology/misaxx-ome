@@ -24,7 +24,20 @@ namespace misaxx_ome {
 template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_scalar<ome::xml::model::primitives::Quantity<Unit, T>>,
         misaxx::scalar_operators<misa_ome_quantity<T, Unit>, T> {
 
+        /**
+         * OME quantity that is stored inside this object
+         */
         using value_type = ome::xml::model::primitives::Quantity<Unit, T>;
+
+        /**
+         * Raw value type that the OME quantity is storing
+         */
+        using raw_value_type = T;
+
+        /**
+         * Unit enum
+         */
+        using unity_type = Unit;
 
         misa_ome_quantity() = default;
 
