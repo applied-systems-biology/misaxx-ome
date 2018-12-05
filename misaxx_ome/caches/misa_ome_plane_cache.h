@@ -22,7 +22,7 @@ namespace misaxx_ome {
      * The plane is accessed via a misa_ome_plane_location that indicates where the 2D image data is located within the TIFF file.
      * @tparam Image cv::Mat or a coixx::image
      */
-    template<class Image = cv::Mat> struct misa_ome_plane_cache : public misaxx::misa_manual_cache<cxxh::cache<Image>, misa_ome_plane_location> {
+    template<class Image = cv::Mat> struct misa_ome_plane_cache : public misaxx::misa_manual_cache<cxxh::cache<Image>, misa_ome_plane_description> {
         Image &get() override {
             return m_cached_image;
         }
@@ -80,7 +80,7 @@ namespace misaxx_ome {
             }
         }
 
-        void do_link(const misa_ome_plane_location &t_description) override {
+        void do_link(const misa_ome_plane_description &t_description) override {
             // Won't do anything, as we depend on the tiff_reader (and internal coordinates)
             if(!static_cast<bool>(m_tiff)) {
                 throw std::runtime_error("Cannot link OME TIFF plane without a TIFF IO!");
@@ -101,8 +101,8 @@ namespace misaxx_ome {
          * Gets the location within the OME TIFF
          * @return
          */
-        const misa_ome_plane_location &get_plane_location() const {
-            return this->describe()->template get<misa_ome_plane_location>();
+        const misa_ome_plane_description &get_plane_location() const {
+            return this->describe()->template get<misa_ome_plane_description>();
         }
 
     private:

@@ -17,7 +17,7 @@ namespace misaxx_ome {
     /**
      * Describes the location of an image plane (2D image) within an OME TIFF
      */
-    struct misa_ome_plane_location : public misaxx::misa_data_description {
+    struct misa_ome_plane_description : public misaxx::misa_data_description {
 
         /**
          * The series of images the target image belongs to.
@@ -38,14 +38,14 @@ namespace misaxx_ome {
          */
         ome::files::dimension_size_type t = 0;
 
-        misa_ome_plane_location() = default;
+        misa_ome_plane_description() = default;
 
-        explicit misa_ome_plane_location(ome::files::dimension_size_type t_series) :
+        explicit misa_ome_plane_description(ome::files::dimension_size_type t_series) :
                 series(t_series), z(0), c(0), t(0) {
 
         }
 
-        explicit misa_ome_plane_location(ome::files::dimension_size_type t_series, ome::files::dimension_size_type t_z, ome::files::dimension_size_type t_c, ome::files::dimension_size_type t_t) :
+        explicit misa_ome_plane_description(ome::files::dimension_size_type t_series, ome::files::dimension_size_type t_z, ome::files::dimension_size_type t_c, ome::files::dimension_size_type t_t) :
             series(t_series), z(t_z), c(t_c), t(t_t) {
 
         }
@@ -101,52 +101,52 @@ namespace misaxx_ome {
             return misaxx::misa_serialization_id("misa_ome", "ome-image-location");
         }
 
-        bool operator==(const misa_ome_plane_location &rhs) const {
+        bool operator==(const misa_ome_plane_description &rhs) const {
             return series == rhs.series &&
                    z == rhs.z &&
                    c == rhs.c &&
                    t == rhs.t;
         }
 
-        bool operator!=(const misa_ome_plane_location &rhs) const {
+        bool operator!=(const misa_ome_plane_description &rhs) const {
             return !(rhs == *this);
         }
 
-        bool operator<(const misa_ome_plane_location &rhs) const {
+        bool operator<(const misa_ome_plane_description &rhs) const {
             return series < rhs.series || z < rhs.z || c < rhs.c || t < rhs.t;
         }
 
-        bool operator>(const misa_ome_plane_location &rhs) const {
+        bool operator>(const misa_ome_plane_description &rhs) const {
             return rhs < *this;
         }
 
-        bool operator<=(const misa_ome_plane_location &rhs) const {
+        bool operator<=(const misa_ome_plane_description &rhs) const {
             return !(rhs < *this);
         }
 
-        bool operator>=(const misa_ome_plane_location &rhs) const {
+        bool operator>=(const misa_ome_plane_description &rhs) const {
             return !(*this < rhs);
         }
 
-        friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_location &location) {
+        friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_description &location) {
             os << "S" << location.series << "_Z" << location.z << "_C" << location.c << "_T" << location.t;
             return os;
         }
     };
 
-    void to_json(nlohmann::json& j, const misa_ome_plane_location& p) {
+    inline void to_json(nlohmann::json& j, const misa_ome_plane_description& p) {
         p.to_json(j);
     }
 
-    void from_json(const nlohmann::json& j, misa_ome_plane_location& p) {
+    inline void from_json(const nlohmann::json& j, misa_ome_plane_description& p) {
         p.from_json(j);
     }
 }
 
 namespace std {
-    template <> struct hash<misaxx_ome::misa_ome_plane_location>
+    template <> struct hash<misaxx_ome::misa_ome_plane_description>
     {
-        size_t operator()(const misaxx_ome::misa_ome_plane_location & x) const
+        size_t operator()(const misaxx_ome::misa_ome_plane_description & x) const
         {
             const auto H = hash<ome::files::dimension_size_type>();
             return H(x.series) + H(x.z) + H(x.c) + H(x.t);

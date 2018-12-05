@@ -8,7 +8,7 @@
 #include <ome/files/VariantPixelBuffer.h>
 #include <ome/files/FormatReader.h>
 #include <opencv2/opencv.hpp>
-#include <misaxx_ome/descriptions/misa_ome_plane_location.h>
+#include <misaxx_ome/descriptions/misa_ome_plane_description.h>
 
 namespace misaxx_ome {
 
@@ -53,7 +53,7 @@ namespace misaxx_ome {
      * @param ome
      * @return
      */
-    inline cv::Mat ome_to_opencv(const ome::files::FormatReader &ome_reader, const misa_ome_plane_location &index) {
+    inline cv::Mat ome_to_opencv(const ome::files::FormatReader &ome_reader, const misa_ome_plane_description &index) {
         
         using namespace ome::xml::model::enums;
         

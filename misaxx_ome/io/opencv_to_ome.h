@@ -18,7 +18,7 @@
 #include <ome/files/MetadataTools.h>
 #include <ome/files/CoreMetadata.h>
 #include <opencv2/opencv.hpp>
-#include <misaxx_ome/descriptions/misa_ome_plane_location.h>
+#include <misaxx_ome/descriptions/misa_ome_plane_description.h>
 
 namespace misaxx_ome {
 
@@ -106,7 +106,7 @@ namespace misaxx_ome {
         return meta;
     }
 
-    template<typename RawType, int OMEPixelType> inline void opencv_to_ome_detail(const cv::Mat &opencv_image, ome::files::out::OMETIFFWriter &ome_writer, const misa_ome_plane_location &index) {
+    template<typename RawType, int OMEPixelType> inline void opencv_to_ome_detail(const cv::Mat &opencv_image, ome::files::out::OMETIFFWriter &ome_writer, const misa_ome_plane_description &index) {
         using namespace ome::files;
         using namespace ome::xml::model::enums;
         const int size_x = opencv_image.cols;
@@ -135,7 +135,7 @@ namespace misaxx_ome {
         ome_writer.saveBytes(index.index_within(ome_writer), vbuffer);
     }
 
-    inline void opencv_to_ome(const cv::Mat &opencv_image, ome::files::out::OMETIFFWriter &ome_writer, const misa_ome_plane_location &index) {
+    inline void opencv_to_ome(const cv::Mat &opencv_image, ome::files::out::OMETIFFWriter &ome_writer, const misa_ome_plane_description &index) {
 
         using namespace ome::xml::model::enums;
 

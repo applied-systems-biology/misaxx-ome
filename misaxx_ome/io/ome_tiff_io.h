@@ -72,15 +72,15 @@ namespace misaxx_ome {
                 : ome_tiff_io(std::move(t_path), t_reference.get_metadata()) {
         }
 
-        void write_plane(const cv::Mat &image, const misa_ome_plane_location &index) {
+        void write_plane(const cv::Mat &image, const misa_ome_plane_description &index) {
             if(index.series != 0)
                 throw std::runtime_error("Only series 0 is currently supported!");
             auto writer = get_writer(index);
-            opencv_to_ome(image, *writer.value, misa_ome_plane_location(0, 0, 0, 0));
+            opencv_to_ome(image, *writer.value, misa_ome_plane_description(0, 0, 0, 0));
             writer.value->close();
         }
 
-        cv::Mat read_plane(const misa_ome_plane_location &index) const {
+        cv::Mat read_plane(const misa_ome_plane_description &index) const {
             if(index.series != 0)
                 throw std::runtime_error("Only series 0 is currently supported!");
             auto reader = get_reader();
@@ -137,7 +137,7 @@ namespace misaxx_ome {
         * The writer is unique-locked (sequential access!)
         * @return
         */
-        locked_writer_type get_writer(const misa_ome_plane_location &t_location) const {
+        locked_writer_type get_writer(const misa_ome_plane_description &t_location) const {
             std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
             lock.lock();
 
@@ -243,7 +243,7 @@ namespace misaxx_ome {
         /**
          * Because of limitations to OMETIFFWriter, we buffer any output TIFF in a separate directory
          */
-        mutable std::map<misa_ome_plane_location, boost::filesystem::path> m_write_buffer;
+        mutable std::map<misa_ome_plane_description, boost::filesystem::path> m_write_buffer;
 
         mutable std::shared_ptr<ome::files::in::OMETIFFReader> m_reader;
         mutable std::shared_ptr<ome::xml::meta::OMEXMLMetadata> m_metadata;
@@ -293,7 +293,7 @@ namespace misaxx_ome {
             for(const auto &kv : m_write_buffer) {
                 std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << kv.first << std::endl;
                 reader->setId(kv.second);
-                ome_to_ome(*reader, misa_ome_plane_location(0, 0, 0, 0), *writer, kv.first);
+                ome_to_ome(*reader, misa_ome_plane_description(0, 0, 0, 0), *writer, kv.first);
             }
 
             reader->close();
@@ -306,7 +306,7 @@ namespace misaxx_ome {
          * @param t_location
          * @return
          */
-        boost::filesystem::path get_write_buffer_path(const misa_ome_plane_location &t_location) const {
+        boost::filesystem::path get_write_buffer_path(const misa_ome_plane_description &t_location) const {
             return m_path.parent_path() / "__misa_ome_write_buffer__" / (m_path.filename().string() + "_" + cxxh::to_string(t_location) + ".ome.tif");
         }
 
@@ -315,7 +315,7 @@ namespace misaxx_ome {
          * @param t_location
          * @return
          */
-        std::shared_ptr<ome::files::out::OMETIFFWriter> get_buffer_writer(const misa_ome_plane_location &t_location) const {
+        std::shared_ptr<ome::files::out::OMETIFFWriter> get_buffer_writer(const misa_ome_plane_description &t_location) const {
             const auto size_X = m_metadata->getPixelsSizeX(t_location.series);
             const auto size_Y = m_metadata->getPixelsSizeY(t_location.series);
             const std::vector<size_t> channels = { static_cast<size_t>(m_metadata->getChannelSamplesPerPixel(t_location.series, t_location.c)) };
@@ -354,12 +354,12 @@ namespace misaxx_ome {
                 for(size_t z = 0; z < size_Z; ++z) {
                     for(size_t c = 0; c < size_C; ++c) {
                         for (size_t t = 0; t < size_T; ++t) {
-                            const misa_ome_plane_location location(series, z, c, t);
+                            const misa_ome_plane_description location(series, z, c, t);
                             const auto location_name = cxxh::to_string(location);
                             std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << std::endl;
 
                             auto writer = get_buffer_writer(location);
-                            ome_to_ome(*m_reader, misa_ome_plane_location(series, z, c, t), *writer, misa_ome_plane_location(0, 0, 0, 0));
+                            ome_to_ome(*m_reader, misa_ome_plane_description(series, z, c, t), *writer, misa_ome_plane_description(0, 0, 0, 0));
                             writer->close();
                         }
                     }

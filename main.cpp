@@ -77,10 +77,10 @@ int main(int argc, const char** argv) {
 //    for(size_t p = 0; p < tiff.get_num_planes(0); ++p) {
 ////        auto i = tiff.get_num_planes(0) - p - 1;
 //        auto i = p;
-//        const auto loc = misa_ome_plane_location(0, 0, 0, 0);
+//        const auto loc = misa_ome_plane_description(0, 0, 0, 0);
 //        cv::Mat plane = tiff.read_plane(loc);
 //        std::cout << "Write plane " << p << std::endl;
-//        tiff_write.write_plane(plane, misa_ome_plane_location(0, p, 0, 0));
+//        tiff_write.write_plane(plane, misa_ome_plane_description(0, p, 0, 0));
 //    }
 //
 //    tiff_write.close();

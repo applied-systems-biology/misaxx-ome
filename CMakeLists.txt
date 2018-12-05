@@ -33,8 +33,8 @@ add_library(misaxx_ome
         misaxx_ome/io/json_ome_pixel_type.cpp
         misaxx_ome/helpers/ome_helpers.h
         misaxx_ome/helpers/ome_helpers.cpp
-        misaxx_ome/descriptions/misa_ome_plane_location.h
-        misaxx_ome/descriptions/misa_ome_plane_location.cpp
+        misaxx_ome/descriptions/misa_ome_plane_description.h
+        misaxx_ome/descriptions/misa_ome_plane_description.cpp
         misaxx_ome/accessors/misa_ome_plane.cpp
         misaxx_ome/accessors/misa_ome_plane.h
         misaxx_ome/accessors/misa_ome_tiff.cpp
@@ -44,7 +44,7 @@ add_library(misaxx_ome
         misaxx_ome/helpers/misa_ome_tiff_description_builder.h
         misaxx_ome/helpers/misa_ome_tiff_description_builder.cpp
         misaxx_ome/io/coixx_to_ome.h
-        misaxx_ome/io/coixx_to_ome.cpp misaxx_ome/attachments/misa_ome_quantity.cpp misaxx_ome/attachments/misa_ome_quantity.h)
+        misaxx_ome/io/coixx_to_ome.cpp misaxx_ome/attachments/misa_ome_quantity.cpp misaxx_ome/attachments/misa_ome_quantity.h misaxx_ome/attachments/misa_ome_location.cpp misaxx_ome/attachments/misa_ome_location.h)
 
 target_link_libraries(misaxx_ome PUBLIC OME::Files)
 misa_module(misaxx_ome)

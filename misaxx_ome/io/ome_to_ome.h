@@ -6,15 +6,15 @@
 #pragma once
 
 #include <ome/files/out/OMETIFFWriter.h>
-#include <misaxx_ome/descriptions/misa_ome_plane_location.h>
+#include <misaxx_ome/descriptions/misa_ome_plane_description.h>
 #include <ome/files/VariantPixelBuffer.h>
 
 namespace misaxx_ome {
 
     template<int OMEPixelType> inline void ome_to_ome_detail (const ome::files::FormatReader &ome_reader,
-                                                                        const misa_ome_plane_location &input_index,
+                                                                        const misa_ome_plane_description &input_index,
                                                                         ome::files::out::OMETIFFWriter &ome_writer,
-                                                                        const misa_ome_plane_location &output_index) {
+                                                                        const misa_ome_plane_description &output_index) {
         using namespace ome::files;
         using namespace ome::xml::model::enums;
 
@@ -57,9 +57,9 @@ namespace misaxx_ome {
      * @param output_index
      */
     inline void ome_to_ome(const ome::files::FormatReader &ome_reader,
-            const misa_ome_plane_location &input_index,
+            const misa_ome_plane_description &input_index,
             ome::files::out::OMETIFFWriter &ome_writer,
-            const misa_ome_plane_location &output_index) {
+            const misa_ome_plane_description &output_index) {
         using namespace ome::xml::model::enums;
         switch(ome_reader.getPixelType()) {
             case PixelType::UINT8: {

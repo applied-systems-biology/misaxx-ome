@@ -14,11 +14,11 @@ namespace misaxx_ome {
         }
     };
 
-    void to_json(nlohmann::json& j, const misa_ome_tiff_pattern& p) {
+    inline void to_json(nlohmann::json& j, const misa_ome_tiff_pattern& p) {
         p.to_json(j);
     }
 
-    void from_json(const nlohmann::json& j, misa_ome_tiff_pattern& p) {
+    inline void from_json(const nlohmann::json& j, misa_ome_tiff_pattern& p) {
         p.from_json(j);
     }
 }

@@ -37,7 +37,7 @@ namespace misaxx_ome {
          * Returns the location of this plane within the TIFF file
          * @return
          */
-        const misa_ome_plane_location &get_plane_location() const {
+        const misa_ome_plane_description &get_plane_location() const {
             return this->data->get_plane_location();
         }
 

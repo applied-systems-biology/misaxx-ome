@@ -49,7 +49,7 @@ namespace misaxx_ome {
             return this->data->get().at(index);
         }
 
-        misa_ome_plane<Image> at(const misa_ome_plane_location &index) {
+        misa_ome_plane<Image> at(const misa_ome_plane_description &index) {
             return this->data->get_plane(index);
         }
 

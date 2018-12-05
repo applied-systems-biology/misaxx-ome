@@ -80,7 +80,7 @@ namespace misaxx_ome {
                             misa_ome_plane<Image> cache;
                             cache.data = std::make_shared<misa_ome_plane_cache<Image>>();
                             cache.data->set_tiff_io(m_tiff);
-                            cache.force_link(this->get_location(), misaxx::misa_description_storage::with(misa_ome_plane_location(series, z, c, t)));
+                            cache.force_link(this->get_location(), misaxx::misa_description_storage::with(misa_ome_plane_description(series, z, c, t)));
                             this->get().emplace_back(std::move(cache));
                         }
                     }
@@ -106,7 +106,7 @@ namespace misaxx_ome {
          * @param t_location
          * @return
          */
-        misa_ome_plane<Image> get_plane(const misa_ome_plane_location &t_location) const {
+        misa_ome_plane<Image> get_plane(const misa_ome_plane_description &t_location) const {
             const auto num_series = m_tiff->get_num_series();
             const auto size_Z = m_tiff->get_size_z(t_location.series);
             const auto size_C = m_tiff->get_size_c(t_location.series);
