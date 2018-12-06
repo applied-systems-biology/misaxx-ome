@@ -20,8 +20,25 @@
 #include "opencv_to_ome.h"
 #include "ome_to_ome.h"
 #include <misaxx_ome/helpers/ome_helpers.h>
+#include <ome/files/MetadataTools.h>
 
 namespace misaxx_ome {
+
+    /**
+     * Exposes the internal OME XML, as the metadata maps do not contain all information for some reason
+     */
+    struct custom_ome_tiff_reader : public ome::files::in::OMETIFFReader {
+
+        std::shared_ptr<ome::xml::meta::OMEXMLMetadata> get_xml_metadata() const {
+            auto meta = cacheMetadata(*currentId); // Try the cached metadata of the current file
+            boost::filesystem::path first_tiff_path = meta->getUUIDFileName(0, 0);
+            first_tiff_path = boost::filesystem::canonical(first_tiff_path, currentId.value().parent_path());
+            if(currentId != first_tiff_path) {
+                meta = ome::files::createOMEXMLMetadata(first_tiff_path);
+            }
+            return meta;
+        }
+    };
 
     /**
      * Allows thread-safe read and write access to an OME TIFF
@@ -245,7 +262,7 @@ namespace misaxx_ome {
          */
         mutable std::map<misa_ome_plane_description, boost::filesystem::path> m_write_buffer;
 
-        mutable std::shared_ptr<ome::files::in::OMETIFFReader> m_reader;
+        mutable std::shared_ptr<custom_ome_tiff_reader> m_reader;
         mutable std::shared_ptr<ome::xml::meta::OMEXMLMetadata> m_metadata;
         mutable std::shared_mutex m_mutex;
 
@@ -262,13 +279,25 @@ namespace misaxx_ome {
         }
 
         void open_reader() const {
-            m_reader = std::make_shared<ome::files::in::OMETIFFReader>();
+            m_reader = std::make_shared<custom_ome_tiff_reader>();
             m_reader->setMetadataFiltered(false);
             m_reader->setGroupFiles(true);
             m_reader->setId(m_path);
 
+            // INFO: This would be the proper way of loading the metadata, but it does not work
+            // For example PhysicalSize properties are missing
+//            if(!static_cast<bool>(m_metadata)) {
+//               m_metadata = ome::files::createOMEXMLMetadata(*m_reader);
+//               ome::files::fillOriginalMetadata(*m_metadata, m_reader->getGlobalMetadata());
+//
+//               for(size_t series = 0; series < m_reader->getSeriesCount(); ++series) {
+//                   m_reader->setSeries(series);
+//                   ome::files::fillOriginalMetadata(*m_metadata, m_reader->getSeriesMetadata());
+//               }
+//            }
+
             if(!static_cast<bool>(m_metadata)) {
-               m_metadata = ome::files::createOMEXMLMetadata(*m_reader);
+                m_metadata = m_reader->get_xml_metadata(); // Copy the XML data to be sure
             }
         }
 
