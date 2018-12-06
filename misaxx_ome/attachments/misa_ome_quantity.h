@@ -21,8 +21,9 @@ namespace misaxx_ome {
     * @tparam T the type that measures the unit
     * @tparam Unit the unit type
     */
-template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_scalar<ome::xml::model::primitives::Quantity<Unit, T>>,
-        misaxx::scalar_operators<misa_ome_quantity<T, Unit>, T> {
+    template<typename T, class Unit>
+    struct misa_ome_quantity : public misaxx::misa_scalar<ome::xml::model::primitives::Quantity<Unit, T>>,
+                               misaxx::scalar_operators<misa_ome_quantity<T, Unit>, T> {
 
         /**
          * OME quantity that is stored inside this object
@@ -91,7 +92,7 @@ template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_
          * @param value
          */
         void set_value(T value) {
-            value = value_type (std::move(value), get_unit());
+            value = value_type(std::move(value), get_unit());
         }
 
         bool operator==(const misa_ome_quantity<T, Unit> &rhs) const {
@@ -102,26 +103,51 @@ template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_
             return this->value < rhs.value;
         }
 
-        misa_ome_quantity<T, Unit>& operator+=(const misa_ome_quantity<T, Unit>& rhs) {
+        misa_ome_quantity<T, Unit> &operator+=(const misa_ome_quantity<T, Unit> &rhs) {
             this->value += rhs.value;
             return *this;
         }
 
-        misa_ome_quantity<T, Unit>& operator-=(const misa_ome_quantity<T, Unit>& rhs) {
+        misa_ome_quantity<T, Unit> &operator-=(const misa_ome_quantity<T, Unit> &rhs) {
             this->value -= rhs.value;
             return *this;
         }
 
-        misa_ome_quantity<T, Unit>& operator*=(const misa_ome_quantity<T, Unit>& rhs) {
+        misa_ome_quantity<T, Unit> &operator*=(const misa_ome_quantity<T, Unit> &rhs) {
             this->value *= rhs.value;
             return *this;
         }
 
-        misa_ome_quantity<T, Unit>& operator/=(const misa_ome_quantity<T, Unit>& rhs) {
+        misa_ome_quantity<T, Unit> &operator/=(const misa_ome_quantity<T, Unit> &rhs) {
             this->value /= rhs.value;
             return *this;
         }
+
+        /**
+         * Helper method that creates an array of quantities with the same unit
+         * @tparam Count
+         * @param values
+         * @param unit
+         * @return
+         */
+        template<size_t Count>
+        static std::array<misa_ome_quantity<T, Unit>, Count>
+        make_array(const std::array<T, Count> &values, const Unit &unit) {
+            std::array<misa_ome_quantity<T, Unit>, Count> result;
+            for (size_t i = 0; i < Count; ++i) {
+                result[i] = misa_ome_quantity<T, Unit>(values[i], unit);
+            }
+            return result;
+        }
     };
+
+    using misa_ome_unit_length = ome::xml::model::enums::UnitsLength;
+    using misa_ome_unit_electric_potential = ome::xml::model::enums::UnitsElectricPotential;
+    using misa_ome_unit_frequency = ome::xml::model::enums::UnitsFrequency;
+    using misa_ome_unit_power = ome::xml::model::enums::UnitsPower;
+    using misa_ome_unit_pressure = ome::xml::model::enums::UnitsPressure;
+    using misa_ome_unit_temperature = ome::xml::model::enums::UnitsTemperature;
+    using misa_ome_unit_time = ome::xml::model::enums::UnitsTime;
 
     template<typename T = double> using misa_ome_length = misa_ome_quantity<T, ome::xml::model::enums::UnitsLength>;
     template<typename T = double> using misa_ome_electric_potential = misa_ome_quantity<T, ome::xml::model::enums::UnitsElectricPotential>;
@@ -130,16 +156,17 @@ template<typename T, class Unit> struct misa_ome_quantity : public misaxx::misa_
     template<typename T = double> using misa_ome_pressure = misa_ome_quantity<T, ome::xml::model::enums::UnitsPressure>;
     template<typename T = double> using misa_ome_temperature = misa_ome_quantity<T, ome::xml::model::enums::UnitsTemperature>;
     template<typename T = double> using misa_ome_time = misa_ome_quantity<T, ome::xml::model::enums::UnitsTime>;
+
 }
 
 namespace nlohmann {
-    template <typename T, class Unit>
+    template<typename T, class Unit>
     struct adl_serializer<misaxx_ome::misa_ome_quantity<T, Unit>> {
-        static void to_json(json& j, const misaxx_ome::misa_ome_quantity<T, Unit>& opt) {
+        static void to_json(json &j, const misaxx_ome::misa_ome_quantity<T, Unit> &opt) {
             opt.to_json(j);
         }
 
-        static void from_json(const json& j, misaxx_ome::misa_ome_quantity<T, Unit>& opt) {
+        static void from_json(const json &j, misaxx_ome::misa_ome_quantity<T, Unit> &opt) {
             opt.from_json(j);
         }
     };
