@@ -46,8 +46,10 @@ namespace misaxx_ome {
             }
         }
 
-        misaxx::misa_serialization_id get_serialization_id() const override {
-            return misaxx::misa_serialization_id("misa_ome", "descriptions/ome-tiff");
+        std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
+            return misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "descriptions/ome-tiff"), {
+                    misaxx::misa_data_description::get_serialization_id_hierarchy()
+            });
         }
     };
 

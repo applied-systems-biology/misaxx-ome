@@ -37,14 +37,11 @@ namespace misaxx_ome {
             t_schema.resolve("ome-planes").declare_required<std::vector<misa_ome_plane_description>>();
         }
 
-        misaxx::misa_serialization_id get_serialization_id() const override {
-            return misaxx::misa_serialization_id("misa_ome", "attachments/ome_location");
-        }
-
         std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
-            return misaxx::misa_serializeable::create_serialization_id_hierarchy(*this, { misaxx::misa_location::get_serialization_id_hierarchy() });
+            return misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "attachments/ome_location"), {
+                    misa_location::get_serialization_id_hierarchy()
+            });
         }
-
     };
 
     inline void to_json(nlohmann::json& j, const misa_ome_location& p) {

@@ -97,8 +97,10 @@ namespace misaxx_ome {
             t_schema.resolve("t").declare_required<ome::files::dimension_size_type>();
         }
 
-        misaxx::misa_serialization_id get_serialization_id() const override {
-            return misaxx::misa_serialization_id("misa_ome", "ome-image-location");
+        std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
+            return misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "ome-image-location"), {
+                    misaxx::misa_data_description::get_serialization_id_hierarchy()
+            });
         }
 
         bool operator==(const misa_ome_plane_description &rhs) const {
