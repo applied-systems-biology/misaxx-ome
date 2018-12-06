@@ -20,6 +20,11 @@ namespace misaxx_ome {
          */
         std::vector<misa_ome_series_description> series;
 
+        /**
+         * Full metadata storage
+         */
+        std::shared_ptr<ome::xml::meta::OMEXMLMetadata> metadata;
+
         using misaxx::misa_file_description::misa_file_description;
 
         void from_json(const nlohmann::json &t_json) override {
@@ -30,6 +35,9 @@ namespace misaxx_ome {
                 s.from_json(it.value());
                 series.emplace_back(std::move(s));
             }
+            if(t_json.find("ome-xml-metadata") != t_json.end()) {
+                metadata = ome::files::createOMEXMLMetadata(t_json["ome-xml-metadata"].get<std::string>());
+            }
         }
 
         void to_json(nlohmann::json &t_json) const override {
@@ -37,6 +45,7 @@ namespace misaxx_ome {
             for(size_t i = 0; i < series.size(); ++i) {
                 series[i].to_json(t_json["series"][std::to_string(i)]);
             }
+            t_json["ome-xml-metadata"] = metadata->dumpXML();
         }
 
         void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
@@ -44,6 +53,7 @@ namespace misaxx_ome {
             for(size_t i = 0; i < series.size(); ++i) {
                 series[i].to_json_schema(t_schema.resolve("series", std::to_string(i)));
             }
+            t_schema.resolve("ome-xml-metadata").declare_optional<std::string>();
         }
 
         std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
