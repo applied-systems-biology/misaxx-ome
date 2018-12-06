@@ -7,6 +7,7 @@
 
 #include <misaxx/attachments/misa_voxel.h>
 #include <misaxx_ome/attachments/misa_ome_quantity.h>
+#include <ome/xml/meta/OMEXMLMetadata.h>
 
 namespace misaxx_ome {
     /**
@@ -40,6 +41,36 @@ namespace misaxx_ome {
         v.range_z.from.convert_to(unit);
         v.range_z.to.convert_to(unit);
         return v;
+    }
+
+    /**
+     * Loads a voxel from the PhysicalSize attributes in the OME xml
+     * @param meta
+     * @param series
+     * @param unit
+     * @return
+     */
+    inline misaxx::misa_voxel<misa_ome_length<double>> misa_ome_voxel(const ome::xml::meta::OMEXMLMetadata &meta, size_t series, const std::optional<misa_ome_unit_length> &unit = std::no_opt) {
+        auto x = meta.getPixelsPhysicalSizeX(series);
+        auto y = meta.getPixelsPhysicalSizeY(series);
+        auto z = meta.getPixelsPhysicalSizeZ(series);
+        if(unit) {
+            if(x.getUnit() != *unit) {
+                x = ome::xml::model::primitives::convert(x, *unit);
+            }
+            if(y.getUnit() != *unit) {
+                y = ome::xml::model::primitives::convert(y, *unit);
+            }
+            if(z.getUnit() != *unit) {
+                z = ome::xml::model::primitives::convert(z, *unit);
+            }
+        }
+
+        misaxx::misa_range<misa_ome_length<double>> rx(misa_ome_length<double>(0, x.getUnit()), misa_ome_length<double>(x.getValue(), x.getUnit()));
+        misaxx::misa_range<misa_ome_length<double>> ry(misa_ome_length<double>(0, y.getUnit()), misa_ome_length<double>(y.getValue(), y.getUnit()));
+        misaxx::misa_range<misa_ome_length<double>> rz(misa_ome_length<double>(0, z.getUnit()), misa_ome_length<double>(z.getValue(), z.getUnit()));
+
+        return misaxx::misa_voxel<misa_ome_length<double>>(rx, ry, rz);
     }
 }
 
