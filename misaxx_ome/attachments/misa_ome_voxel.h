@@ -18,10 +18,11 @@ namespace misaxx_ome {
      * @return
      */
     inline misaxx::misa_voxel<misa_ome_length<double>> misa_ome_voxel(double x, double y, double z, const misa_ome_unit_length &unit) {
+        auto zero = misa_ome_length<double>(0, unit);
         auto x_ = misa_ome_length<double>(x, unit);
         auto y_ = misa_ome_length<double>(y, unit);
         auto z_ = misa_ome_length<double>(z, unit);
-        return misaxx::misa_voxel<misa_ome_length<double>>(std::move(x_), std::move(y_), std::move(z_));
+        return misaxx::misa_voxel<misa_ome_length<double>>({ zero,  std::move(x_)}, {zero, std::move(y_)}, {zero, std::move(z_)});
     }
 }
 

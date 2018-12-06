@@ -14,6 +14,7 @@
 #include <ome/xml/model/enums/UnitsPressure.h>
 #include <ome/xml/model/enums/UnitsTime.h>
 #include <ome/xml/model/enums/UnitsTemperature.h>
+#include <misaxx_ome/io/json_ome_quantity.h>
 
 namespace misaxx_ome {
     /**
@@ -48,17 +49,6 @@ namespace misaxx_ome {
 
         explicit misa_ome_quantity(T v, Unit u) : misaxx::misa_scalar<value_type>(value_type(v, u)) {
 
-        }
-
-        void from_json(const nlohmann::json &t_json) override {
-            const auto u = Unit::values().at(t_json["unit"]);
-            const T v = t_json["value"].get<T>();
-            this->value = value_type(v, u);
-        }
-
-        void to_json(nlohmann::json &t_json) const override {
-            t_json["unit"] = static_cast<std::string>(get_unit());
-            t_json["value"] = get_value();
         }
 
         void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
@@ -160,6 +150,12 @@ namespace misaxx_ome {
 }
 
 namespace nlohmann {
+
+    /**
+     * ADL serializer for misa_ome_quantity
+     * @tparam T
+     * @tparam Unit
+     */
     template<typename T, class Unit>
     struct adl_serializer<misaxx_ome::misa_ome_quantity<T, Unit>> {
         static void to_json(json &j, const misaxx_ome::misa_ome_quantity<T, Unit> &opt) {
