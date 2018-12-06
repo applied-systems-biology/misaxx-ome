@@ -24,6 +24,23 @@ namespace misaxx_ome {
         auto z_ = misa_ome_length<double>(z, unit);
         return misaxx::misa_voxel<misa_ome_length<double>>({ zero,  std::move(x_)}, {zero, std::move(y_)}, {zero, std::move(z_)});
     }
+
+    /**
+     * Helper function that creates a misa_voxel<misa_ome_length<double>> instance from an existing one, but converted to
+     * a specific unit
+     * @param v
+     * @param unit
+     * @return
+     */
+    inline misaxx::misa_voxel<misa_ome_length<double>> misa_ome_voxel(misaxx::misa_voxel<misa_ome_length<double>> v, const misa_ome_unit_length &unit) {
+        v.range_x.from.convert_to(unit);
+        v.range_x.to.convert_to(unit);
+        v.range_y.from.convert_to(unit);
+        v.range_y.to.convert_to(unit);
+        v.range_z.from.convert_to(unit);
+        v.range_z.to.convert_to(unit);
+        return v;
+    }
 }
 
 
