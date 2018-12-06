@@ -74,7 +74,7 @@ namespace misaxx_ome {
          * @param unit
          */
         void convert_to(Unit unit) {
-            this->value = ome::xml::model::primitives::convert(get_value(), unit);
+            this->value = ome::xml::model::primitives::convert(this->value, unit);
         }
 
         /**
