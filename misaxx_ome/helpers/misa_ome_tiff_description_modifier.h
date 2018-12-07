@@ -24,7 +24,7 @@ namespace misaxx_ome {
 
         explicit misa_ome_tiff_description_modifier(misa_ome_tiff_description src) : m_result(std::move(src)) {
             // Copy the metadata to allow derivation
-            m_result.metadata = ome::files::createOMEXMLMetadata(src.metadata->dumpXML());
+            m_result.metadata = ome::files::createOMEXMLMetadata(m_result.metadata->dumpXML());
 
             // Import the channel configuration
             for(size_t series = 0; series < m_result.metadata->getImageCount(); ++series) {
