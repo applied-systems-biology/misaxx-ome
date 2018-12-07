@@ -7,6 +7,7 @@
 #include <misaxx_ome/caches/misa_ome_tiff_cache.h>
 #include <misaxx/misa_cached_data.h>
 #include <misaxx_ome/helpers/misa_ome_tiff_description_builder.h>
+#include <misaxx_ome/helpers/misa_ome_tiff_description_modifier.h>
 
 namespace misaxx_ome {
     /**
@@ -104,9 +105,8 @@ namespace misaxx_ome {
          * The description builder works on a copy
          * @return
          */
-        misa_ome_tiff_description_builder builder() const {
-            return misa_ome_tiff_description_builder(
-                    std::make_shared<misa_ome_tiff_description>(this->get_data_description()));
+        misa_ome_tiff_description_modifier derive() const {
+            return misa_ome_tiff_description_modifier(this->get_data_description());
         }
 
         /**
@@ -115,6 +115,14 @@ namespace misaxx_ome {
          */
         std::shared_ptr<ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const {
             return this->data->get_tiff_io()->get_metadata();
+        }
+
+        /**
+         * Creates a builder that allows creating a TIFF description from scratch
+         * @return
+         */
+        static misa_ome_tiff_description_builder build() {
+            return misa_ome_tiff_description_builder();
         }
     };
 }
