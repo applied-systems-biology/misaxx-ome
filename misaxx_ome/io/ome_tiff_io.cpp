@@ -219,7 +219,10 @@ cv::Mat misaxx_ome::ome_tiff_io::read_plane(const misaxx_ome::misa_ome_plane_des
         throw std::runtime_error("Only series 0 is currently supported!");
 
     auto reader = get_reader(index);
-    return ome_to_opencv(*reader.value, index);
+    if(m_write_buffer.find(index) == m_write_buffer.end())
+        return ome_to_opencv(*reader.value, index);
+    else
+        return ome_to_opencv(*reader.value, misaxx_ome::misa_ome_plane_description(0, 0, 0 ,0));
 }
 
 void misaxx_ome::ome_tiff_io::write_plane(const cv::Mat &image, const misaxx_ome::misa_ome_plane_description &index) {
