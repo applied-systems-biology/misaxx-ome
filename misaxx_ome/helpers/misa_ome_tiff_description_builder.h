@@ -22,14 +22,12 @@ namespace misaxx_ome {
 
         misa_ome_tiff_description_builder() = default;
 
-        /**
-         * Returns the final result as OMEXMLMetadata
-         * @return
-         */
-        explicit operator std::shared_ptr<ome::xml::meta::OMEXMLMetadata>() {
-            auto meta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
-            ome::files::fillMetadata(*meta, series_list);
-            return meta;
+        explicit misa_ome_tiff_description_builder(misa_ome_tiff_description src) : m_result(std::move(src)) {
+            if(static_cast<bool>(m_result.metadata)) {
+                for(size_t series = 0; series < m_result.metadata->getImageCount(); ++series) {
+                    m_series_list.emplace_back(helpers::create_ome_core_metadata(*m_result.metadata, series));
+                }
+            }
         }
 
         /**
@@ -37,9 +35,8 @@ namespace misaxx_ome {
          * @return
          */
         operator misa_ome_tiff_description() {
-            misa_ome_tiff_description result;
-            result.metadata = static_cast<std::shared_ptr<ome::xml::meta::OMEXMLMetadata>>(*this);
-            return result;
+            ome::files::fillMetadata(*m_result.metadata, m_series_list);
+            return m_result;
         }
 
         /**
@@ -61,8 +58,8 @@ namespace misaxx_ome {
                 throw std::runtime_error("The series must be at least 0");
             m_series = series;
 
-            while(series_list.size() < series + 1) {
-                series_list.emplace_back(std::make_shared<ome::files::CoreMetadata>());
+            while(m_series_list.size() < series + 1) {
+                m_series_list.emplace_back(std::make_shared<ome::files::CoreMetadata>());
             }
 
             return *this;
@@ -70,7 +67,7 @@ namespace misaxx_ome {
 
         ome::files::CoreMetadata &core_metadata() {
             change_series(m_series);
-            return *series_list.at(m_series);
+            return *m_series_list.at(m_series);
         }
 
         /**
@@ -80,7 +77,7 @@ namespace misaxx_ome {
          */
         misa_ome_tiff_description_builder &pixel_channel_type(const ome::xml::model::enums::PixelType &t_pixel_type) {
             core_metadata().pixelType = t_pixel_type;
-            core_metadata().bitsPerPixel = helpers::ome_pixel_type_to_bits_per_pixel(t_pixel_type);
+            core_metadata().bitsPerPixel = ome::files::bitsPerPixel(t_pixel_type);
             return *this;
         }
 
@@ -226,15 +223,16 @@ namespace misaxx_ome {
          */
         template<class Function>
         misa_ome_tiff_description_builder &modify(const Function &t_function) {
-            t_function(series_list);
+            t_function(m_series_list);
             return *this;
         }
 
     private:
+        misa_ome_tiff_description m_result;
         /**
          * The list of series that is managed by this description builder
          */
-        std::vector<std::shared_ptr<ome::files::CoreMetadata>> series_list;
+        std::vector<std::shared_ptr<ome::files::CoreMetadata>> m_series_list;
         /**
          * The current series
          */

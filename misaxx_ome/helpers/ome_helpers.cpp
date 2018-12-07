@@ -1,29 +1,7 @@
 #include <misaxx_ome/helpers/ome_helpers.h>
+#include <ome/files/PixelProperties.h>
+#include "ome_helpers.h"
 
-ome::files::pixel_size_type
-misaxx_ome::helpers::ome_pixel_type_to_bits_per_pixel(const ome::xml::model::enums::PixelType &pixel_type) {
-    using namespace ome::xml::model::enums;
-    switch (pixel_type) {
-        case PixelType::UINT8:
-            return sizeof(unsigned char) * 8;
-        case PixelType::INT8:
-            return sizeof(char) * 8;
-        case PixelType::UINT16:
-            return sizeof(unsigned short) * 8;
-        case PixelType::INT16:
-            return sizeof(short) * 8;
-        case PixelType::UINT32:
-            return sizeof(unsigned int) * 8;
-        case PixelType::INT32:
-            return sizeof(int) * 8;
-        case PixelType::FLOAT:
-            return sizeof(float) * 8;
-        case PixelType::DOUBLE:
-            return sizeof(double) * 8;
-        default:
-            throw std::runtime_error("Unsupported pixel type!");
-    }
-}
 
 std::shared_ptr<ome::files::CoreMetadata>
 misaxx_ome::helpers::create_ome_core_metadata(size_t size_X, size_t size_Y, size_t size_Z, size_t size_T,
@@ -37,7 +15,7 @@ misaxx_ome::helpers::create_ome_core_metadata(size_t size_X, size_t size_Y, size
     core->interleaved = false;
     core->dimensionOrder = ome::xml::model::enums::DimensionOrder::XYZTC;
     core->pixelType = pixel_type;
-    core->bitsPerPixel = ome_pixel_type_to_bits_per_pixel(pixel_type);
+    core->bitsPerPixel = ome::files::bitsPerPixel(pixel_type);
     return core;
 }
 
@@ -58,4 +36,27 @@ misaxx_ome::helpers::create_ome_xml_metadata(size_t size_X, size_t size_Y, size_
     /* create-metadata-end */
 
     return meta;
+}
+
+std::shared_ptr<ome::files::CoreMetadata>
+misaxx_ome::helpers::create_ome_core_metadata(const ome::xml::meta::OMEXMLMetadata &t_metadata, size_t series) {
+
+    using namespace ome::files;
+
+    auto core = std::make_shared<ome::files::CoreMetadata>();
+    
+    core->sizeX = t_metadata.getPixelsSizeX(series);
+    core->sizeY = t_metadata.getPixelsSizeY(series);
+    core->sizeZ = t_metadata.getPixelsSizeZ(series);
+    core->sizeT = t_metadata.getPixelsSizeT(series);
+    core->pixelType = t_metadata.getPixelsType(series);
+    core->interleaved = false;
+    core->indexed = false;
+    core->bitsPerPixel = bitsPerPixel(core->pixelType);
+
+    for(size_t c = 0; c < t_metadata.getChannelCount(series); ++c) {
+        core->sizeC.push_back(t_metadata.getChannelSamplesPerPixel(series, c));
+    }
+
+    return core;
 }

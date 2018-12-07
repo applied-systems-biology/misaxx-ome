@@ -22,15 +22,16 @@ namespace misaxx_ome {
 
         misa_ome_tiff_description_modifier() = default;
 
-        explicit misa_ome_tiff_description_modifier(const misa_ome_tiff_description &src) {
-            data = ome::files::createOMEXMLMetadata(src.metadata->dumpXML()); // Because I don't have a real method to copy them metadata
+        explicit misa_ome_tiff_description_modifier(misa_ome_tiff_description src) : m_result(std::move(src)) {
+            // Copy the metadata to allow derivation
+            m_result.metadata = ome::files::createOMEXMLMetadata(src.metadata->dumpXML());
 
             // Import the channel configuration
-            for(size_t series = 0; series < data->getImageCount(); ++series) {
+            for(size_t series = 0; series < m_result.metadata->getImageCount(); ++series) {
                 std::vector<size_t> channels;
 
-                for(size_t c = 0; c < data->getChannelCount(series); ++c) {
-                    channels.push_back(data->getChannelSamplesPerPixel(series, c));
+                for(size_t c = 0; c < m_result.metadata->getChannelCount(series); ++c) {
+                    channels.push_back(m_result.metadata->getChannelSamplesPerPixel(series, c));
                 }
 
                 m_channels.emplace_back(std::move(channels));
@@ -38,21 +39,11 @@ namespace misaxx_ome {
         }
 
         /**
-         * Returns the final result as OMEXMLMetadata
-         * @return
-         */
-        explicit operator std::shared_ptr<ome::xml::meta::OMEXMLMetadata>() {
-            return data;
-        }
-
-        /**
          * Returns the final TIFF description
          * @return
          */
         operator misa_ome_tiff_description() {
-            misa_ome_tiff_description result;
-            result.metadata = data;
-            return result;
+            return m_result;
         }
 
         /**
@@ -72,7 +63,7 @@ namespace misaxx_ome {
         misa_ome_tiff_description_modifier &change_series(size_t series) {
             if (series < 0)
                 throw std::runtime_error("The series must be at least 0");
-            if(series >= data->getImageCount())
+            if(series >= m_result.metadata->getImageCount())
                 throw std::runtime_error("The requested series does not exist");
             m_series = series;
             while(m_channels.size() < series + 1) {
@@ -88,8 +79,8 @@ namespace misaxx_ome {
         */
         misa_ome_tiff_description_modifier &pixel_channel_type(const ome::xml::model::enums::PixelType &t_pixel_type) {
             change_series(m_series);
-            data->setPixelsType(t_pixel_type, m_series);
-            data->setPixelsSignificantBits(helpers::ome_pixel_type_to_bits_per_pixel(t_pixel_type), m_series);
+            m_result.metadata->setPixelsType(t_pixel_type, m_series);
+            m_result.metadata->setPixelsSignificantBits(ome::files::bitsPerPixel(t_pixel_type), m_series);
             return *this;
         }
 
@@ -169,7 +160,7 @@ namespace misaxx_ome {
          */
         misa_ome_tiff_description_modifier &depth(size_t size) {
             change_series(m_series);
-            data->setPixelsSizeZ(size, m_series);
+            m_result.metadata->setPixelsSizeZ(size, m_series);
             return *this;
         }
 
@@ -199,7 +190,7 @@ namespace misaxx_ome {
          */
         misa_ome_tiff_description_modifier &duration(size_t size) {
             change_series(m_series);
-            data->setPixelsSizeT(size, m_series);
+            m_result.metadata->setPixelsSizeT(size, m_series);
             return *this;
         }
 
@@ -210,7 +201,7 @@ namespace misaxx_ome {
          */
         misa_ome_tiff_description_modifier &width(size_t size) {
             change_series(m_series);
-            data->setPixelsSizeX(size, m_series);
+            m_result.metadata->setPixelsSizeX(size, m_series);
             return *this;
         }
 
@@ -221,7 +212,7 @@ namespace misaxx_ome {
          */
         misa_ome_tiff_description_modifier &height(size_t size) {
             change_series(m_series);
-            data->setPixelsSizeY(size, m_series);
+            m_result.metadata->setPixelsSizeY(size, m_series);
             return *this;
         }
 
@@ -243,7 +234,7 @@ namespace misaxx_ome {
          */
         template<class Function>
         misa_ome_tiff_description_modifier &modify(const Function &t_function) {
-            t_function(*data);
+            t_function(*m_result.metadata);
             return *this;
         }
 
@@ -251,7 +242,7 @@ namespace misaxx_ome {
 
         size_t m_series = 0;
         std::vector<std::vector<size_t>> m_channels;
-        std::shared_ptr<ome::xml::meta::OMEXMLMetadata> data;
+        misa_ome_tiff_description m_result;
 
         /**
          * Writes the channel configuration into the metadata
@@ -261,7 +252,7 @@ namespace misaxx_ome {
                 const auto &channels = m_channels[series];
                 size_t sizeC = std::accumulate(channels.begin(), channels.end(), size_t(0));
 
-                data->setPixelsSizeC(sizeC, series);
+                m_result.metadata->setPixelsSizeC(sizeC, series);
 
                 const size_t effSizeC = channels.size();
 
@@ -269,8 +260,8 @@ namespace misaxx_ome {
                 {
                     size_t rgbC = channels.at(c);
 
-                    data->setChannelID(ome::files::createID("Channel", series, c), series, c);
-                    data->setChannelSamplesPerPixel(static_cast<int>(rgbC), series, c);
+                    m_result.metadata->setChannelID(ome::files::createID("Channel", series, c), series, c);
+                    m_result.metadata->setChannelSamplesPerPixel(static_cast<int>(rgbC), series, c);
                 }
             }
         }
