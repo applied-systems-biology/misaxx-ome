@@ -26,7 +26,7 @@ namespace misaxx_ome {
          * Returns the final result as OMEXMLMetadata
          * @return
          */
-        std::shared_ptr<ome::xml::meta::OMEXMLMetadata> as_ome_metadata() {
+        explicit operator std::shared_ptr<ome::xml::meta::OMEXMLMetadata>() {
             auto meta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
             ome::files::fillMetadata(*meta, series_list);
             return meta;
@@ -36,9 +36,9 @@ namespace misaxx_ome {
          * Returns the final TIFF description
          * @return
          */
-        misa_ome_tiff_description as_description() {
+        operator misa_ome_tiff_description() {
             misa_ome_tiff_description result;
-            result.metadata = as_ome_metadata();
+            result.metadata = static_cast<std::shared_ptr<ome::xml::meta::OMEXMLMetadata>>(*this);
             return result;
         }
 
@@ -47,7 +47,7 @@ namespace misaxx_ome {
          * @return
          */
         std::shared_ptr<misaxx::misa_description_storage> as_storage() {
-            return misaxx::misa_description_storage::with(as_description());
+            return misaxx::misa_description_storage::with(static_cast<misa_ome_tiff_description>(*this));
         }
 
         /**

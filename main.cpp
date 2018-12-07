@@ -37,7 +37,7 @@ struct misa_ome_test_declaration : public misa_module_declaration {
 
     void init_data() override {
         tiff.suggest_import_location(filesystem, "/");
-        out_tiff.suggest_export_location(filesystem, "out_tiff", tiff.derive().of_coixx<coixx::images::bgr8u>().as_storage());
+        out_tiff.suggest_export_location(filesystem, "out_tiff", tiff.derive().of_coixx<coixx::images::bgr8u>());
     }
 };
 
