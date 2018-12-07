@@ -24,6 +24,17 @@ namespace misaxx_ome {
 
         explicit misa_ome_tiff_description_modifier(const misa_ome_tiff_description &src) {
             data = ome::files::createOMEXMLMetadata(src.metadata->dumpXML()); // Because I don't have a real method to copy them metadata
+
+            // Import the channel configuration
+            for(size_t series = 0; series < data->getImageCount(); ++series) {
+                std::vector<size_t> channels;
+
+                for(size_t c = 0; c < data->getChannelCount(series); ++c) {
+                    channels.push_back(data->getChannelSamplesPerPixel(series, c));
+                }
+
+                m_channels.emplace_back(std::move(channels));
+            }
         }
 
         /**
