@@ -25,6 +25,10 @@ namespace misaxx_ome {
     public:
 
         void do_link(const misa_ome_tiff_description &t_description) override {
+
+            if(t_description.filename.empty())
+                throw std::runtime_error("Cannot link to file description with empty file name!");
+
             // We do cache initialization during linkage
             this->set_unique_location(this->get_location() / t_description.filename);
 
