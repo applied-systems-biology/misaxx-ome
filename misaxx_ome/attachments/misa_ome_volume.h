@@ -11,12 +11,12 @@ namespace misaxx_ome {
     /**
      * Allows attaching a volume
      */
-    struct misa_ome_volume : public misa_ome_length<size_t> {
-        misa_ome_volume() : misa_ome_length<size_t>(0, unit_type::PIXEL) {
+    struct misa_ome_volume : public misa_ome_length<double> {
+        misa_ome_volume() : misa_ome_length<double>(0, unit_type::PIXEL) {
 
         }
 
-        explicit misa_ome_volume(size_t value, unit_type unit) : misa_ome_length<size_t>(value, unit) {
+        explicit misa_ome_volume(size_t value, unit_type unit) : misa_ome_length<double>(value, unit) {
 
         }
 
