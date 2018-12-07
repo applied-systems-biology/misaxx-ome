@@ -22,7 +22,7 @@ namespace misaxx_ome {
         misa_ome_tiff_description_modifier() = default;
 
         explicit misa_ome_tiff_description_modifier(const misa_ome_tiff_description &src) {
-
+            data = ome::files::createOMEXMLMetadata(src.metadata->dumpXML()); // Because I don't have a real method to copy them metadata
         }
 
         /**
