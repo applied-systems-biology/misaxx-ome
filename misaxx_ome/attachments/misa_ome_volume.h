@@ -22,7 +22,7 @@ namespace misaxx_ome {
 
         std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
             return misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "attachments/volume"), {
-                    misa_ome_length<size_t>::get_serialization_id_hierarchy()
+                    misa_ome_length<double>::get_serialization_id_hierarchy()
             });
         }
     };
