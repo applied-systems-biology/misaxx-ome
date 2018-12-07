@@ -119,10 +119,13 @@ namespace misaxx_ome {
 
         /**
          * Creates a builder that allows creating a TIFF description from scratch
+         * Please note that if a source description is provided, additional metadata is not copied.
+         * Use derive() instead in this case
+         * @param src Optional source description
          * @return
          */
-        static misa_ome_tiff_description_builder build() {
-            return misa_ome_tiff_description_builder();
+        static misa_ome_tiff_description_builder build(misa_ome_tiff_description src = misa_ome_tiff_description("image.ome.tif")) {
+            return misa_ome_tiff_description_builder(std::move(src));
         }
     };
 }
