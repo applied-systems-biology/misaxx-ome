@@ -61,7 +61,7 @@ namespace misaxx_ome {
                 throw std::runtime_error("The series must be at least 0");
             m_series = series;
 
-            while(series_list.size() <= series) {
+            while(series_list.size() < series + 1) {
                 series_list.emplace_back(std::make_shared<ome::files::CoreMetadata>());
             }
 
@@ -168,7 +168,7 @@ namespace misaxx_ome {
          */
         misa_ome_tiff_description_builder &channels(size_t size, size_t num_channels = 1) {
             if(core_metadata().sizeC.size() < size) {
-                while(core_metadata().sizeC.size() <= size) {
+                while(core_metadata().sizeC.size() < size + 1) {
                     core_metadata().sizeC.push_back(num_channels);
                 }
             }

@@ -64,7 +64,7 @@ namespace misaxx_ome {
             if(series >= data->getImageCount())
                 throw std::runtime_error("The requested series does not exist");
             m_series = series;
-            while(m_channels.size() < series) {
+            while(m_channels.size() < series + 1) {
                 m_channels.emplace_back(std::vector<size_t>());
             }
             return *this;
@@ -171,7 +171,7 @@ namespace misaxx_ome {
         misa_ome_tiff_description_modifier &channels(size_t size, size_t num_channels = 1) {
             change_series(m_series);
             if(m_channels[m_series].size() < size) {
-                while(m_channels[m_series].size() <= size) {
+                while(m_channels[m_series].size() < size + 1) {
                     m_channels[m_series].push_back(num_channels);
                 }
             }
