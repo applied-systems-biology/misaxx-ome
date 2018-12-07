@@ -28,48 +28,24 @@ namespace misaxx_ome {
             // We do cache initialization during linkage
             this->set_unique_location(this->get_location() / t_description.filename);
 
-            bool write_description;
-
             if(boost::filesystem::is_regular_file(this->get_unique_location())) {
                 std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << std::endl;
                 m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location());
-                write_description = true;
+
+                // Put the loaded metadata into the description
+                this->describe()->template get<misa_ome_tiff_description>().metadata = m_tiff->get_metadata();
             }
             else {
                 std::cout << "[Cache] Creating OME TIFF " << this->get_unique_location() << std::endl;
 
-                // Generate from the description
-                if(t_description.series.empty())
-                    throw std::runtime_error("Cannot create a new OME TIFF without any series!");
                 using namespace ome::files;
 
-                // Create the native OME metadata
-                auto meta = std::make_shared<ome::xml::meta::OMEXMLMetadata>();
-                std::vector<std::shared_ptr<CoreMetadata>> series_list;
-
-                for (const auto &series : t_description.series) {
-                    series_list.emplace_back(series.as_ome());
-                }
-
-                ome::files::fillMetadata(*meta, series_list);
-
-                // TODO test
-                for(size_t p = 0; p < t_description.series[0].size_Z; ++p) {
-                    meta->setUUIDFileName("img" + cxxh::to_string(p), 0, p);
-                }
-
                 // Create the TIFF and generate the image caches
-                m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location(), meta);
-                write_description = false;
+                m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location(), t_description.metadata);
             }
 
             // Create the plane caches
-            auto &description = this->describe()->template access<misa_ome_tiff_description>();
             for(size_t series = 0; series < m_tiff->get_num_series(); ++series) {
-                // For loaded files, write the series into the description
-                if(write_description)
-                    description.series.emplace_back(misa_ome_series_description(*m_tiff->get_metadata(), series));
-
                 const auto size_Z = m_tiff->get_size_z(series);
                 const auto size_C = m_tiff->get_size_c(series);
                 const auto size_T = m_tiff->get_size_t(series);

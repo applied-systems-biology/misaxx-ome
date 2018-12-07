@@ -9,6 +9,7 @@
 #include <misaxx/misa_description_storage.h>
 #include <misaxx_ome/io/coixx_to_ome.h>
 #include <misaxx_ome/io/opencv_to_ome.h>
+#include <misaxx_ome/helpers/ome_helpers.h>
 #include <opencv2/core/mat.hpp>
 
 namespace misaxx_ome {

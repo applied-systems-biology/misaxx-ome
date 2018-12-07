@@ -27,8 +27,6 @@ add_library(misaxx_ome
         misaxx_ome/io/opencv_to_ome.cpp
         misaxx_ome/io/ome_tiff_io.h
         misaxx_ome/io/ome_tiff_io.cpp
-        misaxx_ome/descriptions/misa_ome_series_description.h
-        misaxx_ome/descriptions/misa_ome_series_description.cpp
         misaxx_ome/io/json_ome_pixel_type.h
         misaxx_ome/io/json_ome_pixel_type.cpp
         misaxx_ome/helpers/ome_helpers.h
