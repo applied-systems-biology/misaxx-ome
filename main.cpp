@@ -25,8 +25,9 @@
 #include <misaxx_ome/io/ome_tiff_io.h>
 #include <misaxx_ome/accessors/misa_ome_tiff.h>
 #include <coixx/toolbox/toolbox_channels.h>
-#include <misaxx_ome/attachments/misa_ome_unit_length.h>
+#include <misaxx_ome/attachments/misa_ome_unit.h>
 #include <misaxx/attachments/misa_quantity.h>
+#include <misaxx_ome/unit_literals.h>
 
 using namespace misaxx;
 using namespace misaxx_ome;
@@ -74,10 +75,10 @@ int main(int argc, const char** argv) {
     using namespace misaxx_ome;
     using namespace misaxx;
 
-    misa_quantity<double, misa_ome_unit_length<1>> x(5, misa_ome_unit_length<1>(ome::xml::model::enums::UnitsLength::CENTIMETER));
-    misa_quantity<double, misa_ome_unit_length<1>> y(5, misa_ome_unit_length<1>(ome::xml::model::enums::UnitsLength::CENTIMETER));
+    misa_quantity<double, misa_ome_unit_length<1>> x(5, misa_ome_unit_length<1>::ome_unit_type::CENTIMETER);
+    misa_quantity<double, misa_ome_unit_length<1>> y(50, misa_ome_unit_length<1>::ome_unit_type::MILLIMETER);
     auto area = x * y;
-//    auto area_conv = area.cast_unit(misa_ome_unit_length<2>(ome::xml::model::enums::UnitsLength::MILLIMETER));
+    auto area_conv = area.cast_unit(misa_ome_unit_length<2>(ome::xml::model::enums::UnitsLength::MILLIMETER));
 
     return 0;
 }
