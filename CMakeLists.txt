@@ -42,7 +42,13 @@ add_library(misaxx_ome
         misaxx_ome/helpers/misa_ome_tiff_description_builder.h
         misaxx_ome/helpers/misa_ome_tiff_description_builder.cpp
         misaxx_ome/io/coixx_to_ome.h
-        misaxx_ome/io/coixx_to_ome.cpp misaxx_ome/attachments/misa_ome_quantity.cpp misaxx_ome/attachments/misa_ome_quantity.h misaxx_ome/attachments/misa_ome_location.cpp misaxx_ome/attachments/misa_ome_location.h misaxx_ome/attachments/misa_ome_pixels.cpp misaxx_ome/attachments/misa_ome_pixels.h misaxx_ome/attachments/misa_ome_voxel.cpp misaxx_ome/attachments/misa_ome_voxel.h misaxx_ome/io/json_ome_quantity.cpp misaxx_ome/io/json_ome_quantity.h misaxx_ome/helpers/misa_ome_tiff_description_modifier.cpp misaxx_ome/helpers/misa_ome_tiff_description_modifier.h misaxx_ome/attachments/misa_ome_volume.cpp misaxx_ome/attachments/misa_ome_volume.h)
+        misaxx_ome/io/coixx_to_ome.cpp
+        misaxx_ome/attachments/misa_ome_location.cpp
+        misaxx_ome/attachments/misa_ome_location.h
+        misaxx_ome/io/json_ome_quantity.cpp
+        misaxx_ome/io/json_ome_quantity.h
+        misaxx_ome/helpers/misa_ome_tiff_description_modifier.cpp
+        misaxx_ome/helpers/misa_ome_tiff_description_modifier.h misaxx_ome/attachments/misa_ome_unit_length.cpp misaxx_ome/attachments/misa_ome_unit_length.h)
 
 target_link_libraries(misaxx_ome PUBLIC OME::Files)
 misa_module(misaxx_ome)
