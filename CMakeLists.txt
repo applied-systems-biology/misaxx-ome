@@ -48,7 +48,7 @@ add_library(misaxx_ome
         misaxx_ome/io/json_ome_quantity.cpp
         misaxx_ome/io/json_ome_quantity.h
         misaxx_ome/helpers/misa_ome_tiff_description_modifier.cpp
-        misaxx_ome/helpers/misa_ome_tiff_description_modifier.h misaxx_ome/attachments/misa_ome_unit.cpp misaxx_ome/attachments/misa_ome_unit.h)
+        misaxx_ome/helpers/misa_ome_tiff_description_modifier.h misaxx_ome/attachments/misa_ome_unit.cpp misaxx_ome/attachments/misa_ome_unit.h misaxx_ome/attachments/misa_ome_voxel_size.h)
 
 target_link_libraries(misaxx_ome PUBLIC OME::Files)
 misa_module(misaxx_ome)

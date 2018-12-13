@@ -27,7 +27,6 @@
 #include <coixx/toolbox/toolbox_channels.h>
 #include <misaxx_ome/attachments/misa_ome_unit.h>
 #include <misaxx/attachments/misa_quantity.h>
-#include <misaxx_ome/unit_literals.h>
 
 using namespace misaxx;
 using namespace misaxx_ome;
