@@ -47,6 +47,15 @@ namespace misaxx_ome {
          */
         misaxx::misa_quantity<double, misa_ome_unit_length<3>> get_volume() const;
 
+        /**
+         * Gets the area of the xy plane
+         */
+        misaxx::misa_quantity<double, misa_ome_unit_length<2>> get_xy_area() const;
+
+        auto get_unit() const {
+            return values.get_unit();
+        }
+
         auto get_size_x() const {
             return values.get(0, 0);
         }
