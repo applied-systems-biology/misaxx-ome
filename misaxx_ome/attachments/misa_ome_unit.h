@@ -61,6 +61,7 @@ namespace misaxx_ome {
         void to_json(nlohmann::json &t_json) const override {
             misaxx::misa_serializeable::to_json(t_json);
             t_json["unit"] = static_cast<std::string>(m_value);
+            t_json["order"] = Order;
         }
 
         void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
