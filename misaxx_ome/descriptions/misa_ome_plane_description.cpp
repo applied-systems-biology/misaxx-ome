@@ -70,8 +70,3 @@ bool misa_ome_plane_description::operator<(const misa_ome_plane_description &rhs
     return series < rhs.series || z < rhs.z || c < rhs.c || t < rhs.t;
 }
 
-std::ostream &misaxx_ome::operator<<(std::ostream &os, const misa_ome_plane_description &description) {
-    os << "S" << description.series << "_Z" << description.z << "_C" << description.c << "_T" << description.t;
-    return os;
-}
-

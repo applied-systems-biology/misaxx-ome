@@ -76,7 +76,10 @@ namespace misaxx_ome {
 
         bool operator<(const misa_ome_plane_description &rhs) const;
 
-        friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_description &description);
+        friend std::ostream &operator<<(std::ostream &os, const misa_ome_plane_description &description) {
+            os << "S" << description.series << "_Z" << description.z << "_C" << description.c << "_T" << description.t;
+            return os;
+        }
     };
 
     inline void to_json(nlohmann::json& j, const misa_ome_plane_description& p) {
