@@ -72,6 +72,7 @@ namespace misaxx_ome {
             }
             meta.make_enum(std::move(units));
             t_schema.resolve("unit").declare_required(std::move(meta));
+            t_schema.resolve("order").declare_required<size_t>();
         }
 
     protected:
