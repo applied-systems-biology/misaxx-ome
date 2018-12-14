@@ -79,7 +79,7 @@ misaxx::misa_quantity<double, misa_ome_unit_length<3>> misa_ome_voxel_size::get_
 }
 
 misaxx::misa_quantity<double, misa_ome_unit_length<2>> misa_ome_voxel_size::get_xy_area() const {
-    return misaxx::misa_quantity<double, misa_ome_unit_length<2>>(get_size_x() * get_size_y(), get_unit());
+    return misaxx::misa_quantity<double, misa_ome_unit_length<2>>(get_size_x() * get_size_y(),  misa_ome_unit_length<2>(get_unit()));
 }
 
 
