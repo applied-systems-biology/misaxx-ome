@@ -15,6 +15,7 @@
 #include <ome/xml/model/enums/UnitsTime.h>
 #include <ome/xml/model/primitives/Quantity.h>
 #include <misaxx/attachments/misa_unit_numeric.h>
+#include <cxxh/string.h>
 
 namespace misaxx_ome {
     template<size_t Order, class OMEUnit> struct misa_ome_unit : public misaxx::misa_unit<Order>,
@@ -41,7 +42,12 @@ namespace misaxx_ome {
         }
 
         std::string get_literal() const override {
-            return ome_unit_type::values().at(m_value);
+            if constexpr (Order == 1) {
+                return ome_unit_type::values().at(m_value);
+            }
+            else {
+                return ome_unit_type::values().at(m_value) + "^" + cxxh::to_string(Order);
+            }
         }
 
         ome_unit_type get_ome_unit() const {
@@ -67,11 +73,36 @@ namespace misaxx_ome {
             t_schema.resolve("unit").declare_required(std::move(meta));
         }
 
-        std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
-            return misaxx::misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "attachments/units/length"), {
-                misaxx::misa_serializeable::get_serialization_id_hierarchy()
-            });
+    protected:
+        void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override {
+            misaxx::misa_serializeable::build_serialization_id_hierarchy(result);
+            if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsLength>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/length"));
+            }
+            else if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsElectricPotential>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/electric-potential"));
+            }
+            else if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsFrequency>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/frequency"));
+            }
+            else if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsPower>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/power"));
+            }
+            else if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsPressure>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/pressure"));
+            }
+            else if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsTemperature>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/temperature"));
+            }
+            else if constexpr (std::is_same<ome_unit_type, ome::xml::model::enums::UnitsTime>::value) {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/time"));
+            }
+            else {
+                result.emplace_back(misaxx::misa_serialization_id("misa_ome", std::string("attachments/units/") + typeid(ome_unit_type).name()));
+            }
         }
+
+    public:
 
         bool operator==(const misa_ome_unit &rhs) const {
             return m_value == rhs.m_value;

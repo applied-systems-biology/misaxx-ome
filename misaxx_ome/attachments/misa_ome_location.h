@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <misaxx/attachments/misa_range.h>
 #include <misaxx/attachments/misa_location.h>
 #include <misaxx_ome/descriptions/misa_ome_plane_description.h>
 
@@ -37,10 +36,10 @@ namespace misaxx_ome {
             t_schema.resolve("ome-planes").declare_required<std::vector<misa_ome_plane_description>>();
         }
 
-        std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
-            return misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "attachments/ome_location"), {
-                    misa_location::get_serialization_id_hierarchy()
-            });
+    protected:
+        void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override {
+            misa_location::build_serialization_id_hierarchy(result);
+            result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/location"));
         }
     };
 

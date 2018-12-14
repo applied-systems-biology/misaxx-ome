@@ -9,9 +9,7 @@
 
 namespace misaxx_ome {
     struct misa_ome_tiff_pattern : public misaxx::misa_file_pattern {
-        misa_ome_tiff_pattern() : misaxx::misa_file_pattern({ ".tif", ".tiff" }) {
-
-        }
+        misa_ome_tiff_pattern();
     };
 
     inline void to_json(nlohmann::json& j, const misa_ome_tiff_pattern& p) {

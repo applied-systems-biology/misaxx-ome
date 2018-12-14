@@ -23,26 +23,15 @@ namespace misaxx_ome {
 
         using misaxx::misa_file_description::misa_file_description;
 
-        void from_json(const nlohmann::json &t_json) override {
-            misa_file_description::from_json(t_json);
-            metadata = ome::files::createOMEXMLMetadata(t_json["ome-xml-metadata"].get<std::string>());
-        }
+        void from_json(const nlohmann::json &t_json) override;
 
-        void to_json(nlohmann::json &t_json) const override {
-            misa_file_description::to_json(t_json);
-            t_json["ome-xml-metadata"] = metadata->dumpXML();
-        }
+        void to_json(nlohmann::json &t_json) const override;
 
-        void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
-            misa_file_description::to_json_schema(t_schema);
-            t_schema.resolve("ome-xml-metadata").declare_optional<std::string>();
-        }
+        void to_json_schema(const misaxx::misa_json_schema &t_schema) const override;
 
-        std::vector<misaxx::misa_serialization_id> get_serialization_id_hierarchy() const override {
-            return misa_serializeable::create_serialization_id_hierarchy(misaxx::misa_serialization_id("misa_ome", "descriptions/ome-tiff"), {
-                    misaxx::misa_data_description::get_serialization_id_hierarchy()
-            });
-        }
+    protected:
+
+        void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override;
     };
 
     inline void to_json(nlohmann::json& j, const misa_ome_tiff_description& p) {
