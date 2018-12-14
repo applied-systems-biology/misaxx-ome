@@ -22,30 +22,19 @@ namespace misaxx_ome {
 
         misa_ome_tiff_description_builder() = default;
 
-        explicit misa_ome_tiff_description_builder(misa_ome_tiff_description src) : m_result(std::move(src)) {
-            if(static_cast<bool>(m_result.metadata)) {
-                for(size_t series = 0; series < m_result.metadata->getImageCount(); ++series) {
-                    m_series_list.emplace_back(helpers::create_ome_core_metadata(*m_result.metadata, series));
-                }
-            }
-        }
+        explicit misa_ome_tiff_description_builder(misa_ome_tiff_description src);
 
         /**
          * Returns the final TIFF description
          * @return
          */
-        operator misa_ome_tiff_description() {
-            ome::files::fillMetadata(*m_result.metadata, m_series_list);
-            return m_result;
-        }
+        operator misa_ome_tiff_description();
 
         /**
          * Returns the final TIFF description as storage
          * @return
          */
-        std::shared_ptr<misaxx::misa_description_storage> as_storage() {
-            return misaxx::misa_description_storage::with(static_cast<misa_ome_tiff_description>(*this));
-        }
+        std::shared_ptr<misaxx::misa_description_storage> as_storage();
 
         /**
          * All consecutive edit operations run on the provided series.
@@ -53,55 +42,23 @@ namespace misaxx_ome {
          * @param series
          * @return
          */
-        misa_ome_tiff_description_builder &change_series(size_t series) {
-            if (series < 0)
-                throw std::runtime_error("The series must be at least 0");
-            m_series = series;
+        misa_ome_tiff_description_builder &change_series(size_t series);
 
-            while(m_series_list.size() < series + 1) {
-                m_series_list.emplace_back(std::make_shared<ome::files::CoreMetadata>());
-            }
-
-            return *this;
-        }
-
-        ome::files::CoreMetadata &core_metadata() {
-            change_series(m_series);
-            return *m_series_list.at(m_series);
-        }
+        ome::files::CoreMetadata &core_metadata();
 
         /**
          * Sets the type each channel in a plane has
          * @param t_pixel_type
          * @return
          */
-        misa_ome_tiff_description_builder &pixel_channel_type(const ome::xml::model::enums::PixelType &t_pixel_type) {
-            core_metadata().pixelType = t_pixel_type;
-            core_metadata().bitsPerPixel = ome::files::bitsPerPixel(t_pixel_type);
-            return *this;
-        }
+        misa_ome_tiff_description_builder &pixel_channel_type(const ome::xml::model::enums::PixelType &t_pixel_type);
 
         /**
          * Sets the number of channels each pixels has
          * @param channels
          * @return
          */
-        misa_ome_tiff_description_builder &pixel_channels(std::vector<size_t> channels) {
-            if(core_metadata().sizeC.empty())
-                throw std::runtime_error("Please set the number of channels in the channel axis first!");
-            if (channels.size() == 1) {
-                for (auto &s : core_metadata().sizeC) {
-                    s = channels.at(0);
-                }
-            } else {
-                if (channels.size() != core_metadata().sizeC.size())
-                    throw std::runtime_error(
-                            "The size of the provided channel configuration should match the number of planes in channel axis! Please set the number of channels in the channel axis first!");
-                core_metadata().sizeC = std::move(channels);
-            }
-
-            return *this;
-        }
+        misa_ome_tiff_description_builder &pixel_channels(std::vector<size_t> channels);
 
         /**
          * Sets the number of channels each pixels has
@@ -109,10 +66,7 @@ namespace misaxx_ome {
          * @param channels
          * @return
          */
-        misa_ome_tiff_description_builder &pixel_channels(size_t channels) {
-            std::vector<size_t> c = {channels};
-            return pixel_channels(std::move(c));
-        }
+        misa_ome_tiff_description_builder &pixel_channels(size_t channels);
 
         /**
          * Sets the number of channels and the pixel type
@@ -120,21 +74,14 @@ namespace misaxx_ome {
          * @param t_pixel_type
          * @return
          */
-        misa_ome_tiff_description_builder &of(size_t channels, const ome::xml::model::enums::PixelType &t_pixel_type) {
-            pixel_channels(channels);
-            return pixel_channel_type(t_pixel_type);
-        }
+        misa_ome_tiff_description_builder &of(size_t channels, const ome::xml::model::enums::PixelType &t_pixel_type);
 
         /**
          * Sets the number of channels and the pixel type from an OpenCV type
          * @param opencv_type
          * @return
          */
-        misa_ome_tiff_description_builder &of_opencv(int opencv_type) {
-            cv::Mat m(1, 1, opencv_type);
-            pixel_channels(m.channels());
-            return pixel_channel_type(opencv_depth_to_ome_pixel_type(m.depth()));
-        }
+        misa_ome_tiff_description_builder &of_opencv(int opencv_type);
 
         /**
          * Sets the number of channels and the pixel type from an coi++ image type
@@ -152,10 +99,7 @@ namespace misaxx_ome {
          * @param size
          * @return
          */
-        misa_ome_tiff_description_builder &depth(size_t size) {
-            core_metadata().sizeZ = size;
-            return *this;
-        }
+        misa_ome_tiff_description_builder &depth(size_t size);
 
         /**
          * Sets the number of planes in the channel axis
@@ -163,47 +107,28 @@ namespace misaxx_ome {
          * @param size
          * @return
          */
-        misa_ome_tiff_description_builder &channels(size_t size, size_t num_channels = 1) {
-            if(core_metadata().sizeC.size() < size) {
-                while(core_metadata().sizeC.size() < size + 1) {
-                    core_metadata().sizeC.push_back(num_channels);
-                }
-            }
-            else if(core_metadata().sizeC.size() > size) {
-                core_metadata().sizeC.resize(size); // Remove the last
-            }
-            return *this;
-        }
+        misa_ome_tiff_description_builder &channels(size_t size, size_t num_channels = 1);
 
         /**
          * Sets the number of planes in the time axis
          * @param size
          * @return
          */
-        misa_ome_tiff_description_builder &duration(size_t size) {
-            core_metadata().sizeT = size;
-            return *this;
-        }
+        misa_ome_tiff_description_builder &duration(size_t size);
 
         /**
          * Sets the width of the planes
          * @param size
          * @return
          */
-        misa_ome_tiff_description_builder &width(size_t size) {
-            core_metadata().sizeX = size;
-            return *this;
-        }
+        misa_ome_tiff_description_builder &width(size_t size);
 
         /**
          * Sets the height of the planes
          * @param size
          * @return
          */
-        misa_ome_tiff_description_builder &height(size_t size) {
-            core_metadata().sizeY = size;
-            return *this;
-        }
+        misa_ome_tiff_description_builder &height(size_t size);
 
         /**
          * Sets the width and height
@@ -211,9 +136,7 @@ namespace misaxx_ome {
          * @param h
          * @return
          */
-        misa_ome_tiff_description_builder &of_size(size_t w, size_t h) {
-            return width(w).height(h);
-        }
+        misa_ome_tiff_description_builder &of_size(size_t w, size_t h);
 
         /**
          * Modifies the description with a custom function
