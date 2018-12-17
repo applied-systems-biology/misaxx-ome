@@ -7,7 +7,7 @@
 
 #include <misaxx/attachments/misa_matrix.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
-#include "misa_ome_unit.h"
+#include <misaxx_ome/attachments/misa_ome_unit.h>
 
 namespace misaxx_ome {
     /**
