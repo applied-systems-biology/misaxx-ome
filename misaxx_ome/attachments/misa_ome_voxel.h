@@ -12,6 +12,7 @@ namespace misaxx_ome {
 
     /**
      * Models a cuboid 3D voxel
+     * The 'from' point is inclusive, while the 'to' point is exclusive
      */
     struct misa_ome_voxel : public misaxx::misa_serializeable {
         using matrix_type = misaxx::misa_matrix<double, misaxx_ome::misa_ome_unit_length <1>, 3, 2>;
@@ -129,6 +130,12 @@ namespace misaxx_ome {
         void to_json(nlohmann::json &t_json) const override;
 
         void to_json_schema(const misaxx::misa_json_schema &t_schema) const override;
+
+        /**
+         * Returns true if from < to for all coordinates
+         * @return
+         */
+        bool is_valid() const;
 
     protected:
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override;

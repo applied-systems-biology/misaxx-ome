@@ -146,5 +146,9 @@ void misa_ome_voxel::build_serialization_id_hierarchy(std::vector<misa_serializa
     result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/voxel"));
 }
 
+bool misa_ome_voxel::is_valid() const {
+    return get_from_x() < get_to_x() && get_from_y() < get_to_y() && get_from_z() < get_to_z();
+}
+
 
 
