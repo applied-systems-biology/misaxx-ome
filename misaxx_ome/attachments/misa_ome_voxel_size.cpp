@@ -82,5 +82,21 @@ misaxx::misa_quantity<double, misa_ome_unit_length<2>> misa_ome_voxel_size::get_
     return get_size_x() * get_size_y();
 }
 
+misa_ome_unit_length<1> misa_ome_voxel_size::get_unit() const {
+    return values.get_unit();
+}
+
+misaxx::misa_quantity<double, misa_ome_unit_length<1>> misa_ome_voxel_size::get_size_x() const {
+    return values.get(0, 0);
+}
+
+misaxx::misa_quantity<double, misa_ome_unit_length<1>> misa_ome_voxel_size::get_size_y() const {
+    return values.get(1, 0);
+}
+
+misaxx::misa_quantity<double, misa_ome_unit_length<1>> misa_ome_voxel_size::get_size_z() const {
+    return values.get(2, 0);
+}
+
 
 

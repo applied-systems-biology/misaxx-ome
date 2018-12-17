@@ -52,21 +52,13 @@ namespace misaxx_ome {
          */
         misaxx::misa_quantity<double, misa_ome_unit_length<2>> get_xy_area() const;
 
-        auto get_unit() const {
-            return values.get_unit();
-        }
+        misa_ome_unit_length<1> get_unit() const;
 
-        auto get_size_x() const {
-            return values.get(0, 0);
-        }
+        misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_x() const;
 
-        auto get_size_y() const {
-            return values.get(1, 0);
-        }
+        misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_y() const;
 
-        auto get_size_z() const {
-            return values.get(2, 0);
-        }
+        misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_z() const;
 
         void from_json(const nlohmann::json &t_json) override;
 
