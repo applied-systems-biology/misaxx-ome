@@ -10,7 +10,7 @@
 #include <misaxx-helpers/string.h>
 #include <opencv2/opencv.hpp>
 #include <ome/files/in/OMETIFFReader.h>
-#include <coixx/toolbox/toolbox_opencv.h>
+#include <misaxx-coixx/toolbox/toolbox_opencv.h>
 #include <misaxx/misa_default_cache.h>
 #include <misaxx-ome/io/ome_to_opencv.h>
 #include <misaxx-ome/io/ome_tiff_io.h>
