@@ -52,13 +52,35 @@ namespace misaxx_ome {
          */
         misaxx::misa_quantity<double, misa_ome_unit_length<2>> get_xy_area() const;
 
+        /**
+         * Returns the unit of the voxel size
+         * @return
+         */
         misa_ome_unit_length<1> get_unit() const;
 
+        /**
+         * Gets the width
+         * @return
+         */
         misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_x() const;
 
+        /**
+         * Gets the height
+         * @return
+         */
         misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_y() const;
 
+        /**
+         * Gets the depth
+         * @return
+         */
         misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_z() const;
+
+        /**
+         * Gets width = height if they are the same, otherwise throws an error
+         * @return
+         */
+        misaxx::misa_quantity<double, misa_ome_unit_length<1>> get_size_xy() const;
 
         void from_json(const nlohmann::json &t_json) override;
 

@@ -98,5 +98,12 @@ misaxx::misa_quantity<double, misa_ome_unit_length<1>> misa_ome_voxel_size::get_
     return values.get(2, 0);
 }
 
+misaxx::misa_quantity<double, misa_ome_unit_length<1>> misa_ome_voxel_size::get_size_xy() const {
+    if(get_size_x() == get_size_y())
+        return get_size_x();
+    else
+        throw std::runtime_error("Voxel width and height are assumed to be the same!");
+}
+
 
 
