@@ -1,4 +1,5 @@
 #include <misaxx-ome/descriptions/misa_ome_tiff_description.h>
+#include <misaxx/runtime/misa_runtime_base.h>
 
 using namespace misaxx;
 using namespace misaxx_ome;
@@ -10,7 +11,9 @@ void misa_ome_tiff_description::from_json(const nlohmann::json &t_json) {
 
 void misa_ome_tiff_description::to_json(nlohmann::json &t_json) const {
     misa_file_description::to_json(t_json);
-    t_json["ome-xml-metadata"] = metadata->dumpXML();
+    if(!misaxx::misa_runtime_base::instance().is_simulating()) {
+        t_json["ome-xml-metadata"] = metadata->dumpXML();
+    }
 }
 
 void misa_ome_tiff_description::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
