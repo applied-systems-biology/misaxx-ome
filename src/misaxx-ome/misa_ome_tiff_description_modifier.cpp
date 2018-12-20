@@ -12,19 +12,20 @@ using namespace misaxx;
 using namespace misaxx_ome;
 
 misa_ome_tiff_description_modifier::misa_ome_tiff_description_modifier(misa_ome_tiff_description src) : m_result(std::move(src)) {
-    // Copy the metadata to allow derivation
-    if(!misaxx::misa_runtime_base::instance().is_simulating())
+    if(!misaxx::misa_runtime_base::instance().is_simulating()) {
+        // Copy the metadata to allow derivation
         m_result.metadata = ome::files::createOMEXMLMetadata(m_result.metadata->dumpXML());
 
-    // Import the channel configuration
-    for(size_t series = 0; series < m_result.metadata->getImageCount(); ++series) {
-        std::vector<size_t> channels;
+        // Import the channel configuration
+        for(size_t series = 0; series < m_result.metadata->getImageCount(); ++series) {
+            std::vector<size_t> channels;
 
-        for(size_t c = 0; c < m_result.metadata->getChannelCount(series); ++c) {
-            channels.push_back(m_result.metadata->getChannelSamplesPerPixel(series, c));
+            for(size_t c = 0; c < m_result.metadata->getChannelCount(series); ++c) {
+                channels.push_back(m_result.metadata->getChannelSamplesPerPixel(series, c));
+            }
+
+            m_channels.emplace_back(std::move(channels));
         }
-
-        m_channels.emplace_back(std::move(channels));
     }
 }
 
