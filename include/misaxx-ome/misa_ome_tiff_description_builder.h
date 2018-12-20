@@ -8,7 +8,6 @@
 #include <memory>
 #include <misaxx-ome/descriptions/misa_ome_tiff_description.h>
 #include <opencv2/opencv.hpp>
-#include <misaxx-ome/io/opencv_to_ome.h>
 #include <misaxx-ome/io/coixx_to_ome.h>
 #include <misaxx/misa_description_storage.h>
 #include <misaxx-ome/ome_helpers.h>

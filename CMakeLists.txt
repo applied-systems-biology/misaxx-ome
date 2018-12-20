@@ -9,7 +9,7 @@ find_package(OMEXML 5.6.0 REQUIRED)
 
 add_library(misaxx-ome
         include/misaxx-ome/misa_ome.h
-        include/misaxx-ome/io/ome_to_opencv.h
+        src/misaxx-ome/io/ome_to_opencv.h
         src/misaxx-ome/io/ome_to_opencv.cpp
         include/misaxx-ome/caches/misa_ome_tiff_cache.h
         src/misaxx-ome/caches/misa_ome_tiff_cache.cpp
@@ -19,7 +19,7 @@ add_library(misaxx-ome
         src/misaxx-ome/patterns/misa_ome_tiff_pattern.cpp
         include/misaxx-ome/descriptions/misa_ome_tiff_description.h
         src/misaxx-ome/descriptions/misa_ome_tiff_description.cpp
-        include/misaxx-ome/io/opencv_to_ome.h
+        src/misaxx-ome/io/opencv_to_ome.h
         src/misaxx-ome/io/opencv_to_ome.cpp
         include/misaxx-ome/io/ome_tiff_io.h
         src/misaxx-ome/io/ome_tiff_io.cpp
@@ -33,7 +33,7 @@ add_library(misaxx-ome
         include/misaxx-ome/accessors/misa_ome_plane.h
         src/misaxx-ome/accessors/misa_ome_tiff.cpp
         include/misaxx-ome/accessors/misa_ome_tiff.h
-        include/misaxx-ome/io/ome_to_ome.h
+        src/misaxx-ome/io/ome_to_ome.h
         src/misaxx-ome/io/ome_to_ome.cpp
         include/misaxx-ome/misa_ome_tiff_description_builder.h
         src/misaxx-ome/misa_ome_tiff_description_builder.cpp

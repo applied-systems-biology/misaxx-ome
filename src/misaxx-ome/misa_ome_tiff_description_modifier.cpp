@@ -3,6 +3,9 @@
 //
 
 #include <misaxx-ome/misa_ome_tiff_description_modifier.h>
+#include <ome/files/PixelProperties.h>
+#include "io/ome_to_opencv.h"
+#include "io/opencv_to_ome.h"
 
 using namespace misaxx;
 using namespace misaxx_ome;

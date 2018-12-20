@@ -1,4 +1,8 @@
 #include <misaxx-ome/io/ome_tiff_io.h>
+#include <misaxx-ome/descriptions/misa_ome_plane_description.h>
+#include "ome_to_opencv.h"
+#include "opencv_to_ome.h"
+#include "ome_to_ome.h"
 
 
 misaxx_ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path) : m_path(std::move(t_path)) {

@@ -12,8 +12,8 @@
 #include <ome/files/in/OMETIFFReader.h>
 #include <misaxx-coixx/toolbox/toolbox_opencv.h>
 #include <misaxx/misa_default_cache.h>
-#include <misaxx-ome/io/ome_to_opencv.h>
 #include <misaxx-ome/io/ome_tiff_io.h>
+#include <misaxx-ome/descriptions/misa_ome_plane_description.h>
 
 namespace misaxx_ome {
 

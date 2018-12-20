@@ -16,14 +16,14 @@
 #include <misaxx-helpers/cache.h>
 #include <misaxx-helpers/string.h>
 #include <boost/regex.hpp>
-#include <misaxx-ome/io/ome_to_opencv.h>
-#include <misaxx-ome/io/opencv_to_ome.h>
-#include <misaxx-ome/io/ome_to_ome.h>
 #include <misaxx-ome/ome_helpers.h>
 #include <ome/files/MetadataTools.h>
 #include <misaxx-helpers/cache/locked.h>
 
 namespace misaxx_ome {
+
+    // Forward declare
+    struct misa_ome_plane_description;
 
     /**
      * Exposes the internal OME XML, as the metadata maps do not contain all information for some reason
