@@ -32,6 +32,14 @@ namespace misaxx_ome {
     protected:
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override;
     };
+
+    inline void to_json(nlohmann::json& j, const misa_ome_pixel_count& p) {
+        p.to_json(j);
+    }
+
+    inline void from_json(const nlohmann::json& j, misa_ome_pixel_count& p) {
+        p.from_json(j);
+    }
 }
 
 
