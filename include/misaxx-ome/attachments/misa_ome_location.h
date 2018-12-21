@@ -19,28 +19,18 @@ namespace misaxx_ome {
          */
         std::vector<misa_ome_plane_description> planes;
 
-        misa_ome_location() = default;
+        using misaxx::misa_location::misa_location;
 
-        void from_json(const nlohmann::json &t_json) override {
-            misa_location::from_json(t_json);
-            planes = t_json["ome-planes"].get<std::vector<misa_ome_plane_description>>();
-        }
+        explicit misa_ome_location(misaxx::misa_cached_data_base &t_cache, std::vector<misa_ome_plane_description> t_planes);
 
-        void to_json(nlohmann::json &t_json) const override {
-            misa_location::to_json(t_json);
-            t_json["ome-planes"] = planes;
-        }
+        void from_json(const nlohmann::json &t_json) override;
 
-        void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
-            misa_location::to_json_schema(t_schema);
-            t_schema.resolve("ome-planes").declare_required<std::vector<misa_ome_plane_description>>();
-        }
+        void to_json(nlohmann::json &t_json) const override;
+
+        void to_json_schema(const misaxx::misa_json_schema &t_schema) const override;
 
     protected:
-        void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override {
-            misa_location::build_serialization_id_hierarchy(result);
-            result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/location"));
-        }
+        void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override;
     };
 
     inline void to_json(nlohmann::json& j, const misa_ome_location& p) {
