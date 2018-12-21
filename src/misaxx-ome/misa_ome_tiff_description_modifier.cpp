@@ -40,9 +40,6 @@ misa_ome_tiff_description_modifier::operator std::shared_ptr<misaxx::misa_descri
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::change_series(size_t series) {
     if(misaxx::misa_runtime_base::instance().is_simulating())
         return *this;
-
-    if (series < 0)
-        throw std::runtime_error("The series must be at least 0");
     if(series >= m_result.metadata->getImageCount())
         throw std::runtime_error("The requested series does not exist");
     m_series = series;

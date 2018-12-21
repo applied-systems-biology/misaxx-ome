@@ -25,8 +25,6 @@ std::shared_ptr<misaxx::misa_description_storage> misa_ome_tiff_description_buil
 }
 
 misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::change_series(size_t series) {
-    if (series < 0)
-        throw std::runtime_error("The series must be at least 0");
     m_series = series;
 
     while(m_series_list.size() < series + 1) {

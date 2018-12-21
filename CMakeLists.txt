@@ -55,6 +55,7 @@ add_library(misaxx-ome
         include/misaxx-ome/attachments/misa_ome_voxel.h)
 
 misaxx_make_shared(misaxx misaxx-ome)
+misaxx_add_compiler_warnings(misaxx-ome)
 
 target_link_libraries(misaxx-ome PUBLIC OME::Files)
 target_link_libraries(misaxx-ome PUBLIC misaxx::misaxx-core)

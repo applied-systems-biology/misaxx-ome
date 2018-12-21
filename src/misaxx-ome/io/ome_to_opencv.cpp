@@ -28,6 +28,10 @@ cv::Mat misaxx_ome::ome_to_opencv(const ome::files::FormatReader &ome_reader, co
             return ome_to_opencv_detail<float>(ome_buffer, size_x, size_y, channels, CV_32FC(channels));
         case PixelType::DOUBLE:
             return ome_to_opencv_detail<double>(ome_buffer, size_x, size_y, channels, CV_64FC(channels));
+        case PixelType::UINT32:
+        case PixelType::COMPLEXFLOAT:
+        case PixelType::COMPLEXDOUBLE:
+        case PixelType::BIT:
         default:
             throw std::runtime_error("OpenCV does not support this pixel type!");
     }

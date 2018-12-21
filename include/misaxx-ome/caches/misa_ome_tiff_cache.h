@@ -87,8 +87,8 @@ namespace misaxx_ome {
          * @return
          */
         misa_ome_plane<Image> get_plane(const misa_ome_plane_description &t_location) const {
-            const auto num_series = m_tiff->get_num_series();
-            const auto size_Z = m_tiff->get_size_z(t_location.series);
+//            const auto num_series = m_tiff->get_num_series();
+//            const auto size_Z = m_tiff->get_size_z(t_location.series);
             const auto size_C = m_tiff->get_size_c(t_location.series);
             const auto size_T = m_tiff->get_size_t(t_location.series);
 
