@@ -11,7 +11,7 @@ namespace misaxx_ome {
     /**
      * Attachment allows finding an object via its plane location
      */
-    struct misa_ome_location : public misaxx::misa_location {
+    struct misa_ome_planes_location : public misaxx::misa_location {
 
         /**
          * The planes within the referenced OME TIFF that contains the
@@ -21,7 +21,7 @@ namespace misaxx_ome {
 
         using misaxx::misa_location::misa_location;
 
-        explicit misa_ome_location(misaxx::misa_cached_data_base &t_cache, std::vector<misa_ome_plane_description> t_planes);
+        explicit misa_ome_planes_location(misaxx::misa_cached_data_base &t_cache, std::vector<misa_ome_plane_description> t_planes);
 
         void from_json(const nlohmann::json &t_json) override;
 
@@ -33,11 +33,11 @@ namespace misaxx_ome {
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override;
     };
 
-    inline void to_json(nlohmann::json& j, const misa_ome_location& p) {
+    inline void to_json(nlohmann::json& j, const misa_ome_planes_location& p) {
         p.to_json(j);
     }
 
-    inline void from_json(const nlohmann::json& j, misa_ome_location& p) {
+    inline void from_json(const nlohmann::json& j, misa_ome_planes_location& p) {
         p.from_json(j);
     }
 

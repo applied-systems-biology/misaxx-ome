@@ -39,8 +39,8 @@ add_library(misaxx-ome
         src/misaxx-ome/misa_ome_tiff_description_builder.cpp
         include/misaxx-ome/io/coixx_to_ome.h
         src/misaxx-ome/io/coixx_to_ome.cpp
-        src/misaxx-ome/attachments/misa_ome_location.cpp
-        include/misaxx-ome/attachments/misa_ome_location.h
+        src/misaxx-ome/attachments/misa_ome_planes_location.cpp
+        include/misaxx-ome/attachments/misa_ome_planes_location.h
         src/misaxx-ome/io/json_ome_quantity.cpp
         include/misaxx-ome/io/json_ome_quantity.h
         src/misaxx-ome/misa_ome_tiff_description_modifier.cpp
