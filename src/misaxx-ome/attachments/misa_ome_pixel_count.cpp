@@ -20,6 +20,7 @@ void misa_ome_pixel_count::to_json(nlohmann::json &t_json) const {
 }
 
 void misa_ome_pixel_count::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
+    misa_serializeable::to_json_schema(t_schema);
     t_schema.resolve("count").declare_required<long>();
 }
 

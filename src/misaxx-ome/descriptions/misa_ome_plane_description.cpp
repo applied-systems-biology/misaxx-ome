@@ -53,6 +53,7 @@ void misa_ome_plane_description::to_json(nlohmann::json &t_json) const {
 }
 
 void misa_ome_plane_description::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
+    misa_data_description::to_json_schema(t_schema);
     t_schema.resolve("series").declare_required<ome::files::dimension_size_type>();
     t_schema.resolve("z").declare_required<ome::files::dimension_size_type>();
     t_schema.resolve("c").declare_required<ome::files::dimension_size_type>();

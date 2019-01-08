@@ -138,6 +138,7 @@ void misa_ome_voxel::to_json(nlohmann::json &t_json) const {
 }
 
 void misa_ome_voxel::to_json_schema(const misa_json_schema &t_schema) const {
+    misa_serializeable::to_json_schema(t_schema);
     ranges.to_json_schema(t_schema.resolve("ranges"));
 }
 

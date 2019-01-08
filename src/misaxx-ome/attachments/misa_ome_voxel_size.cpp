@@ -61,6 +61,7 @@ void misa_ome_voxel_size::to_json(nlohmann::json &t_json) const {
 }
 
 void misa_ome_voxel_size::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
+    misa_serializeable::to_json_schema(t_schema);
     values.to_json_schema(t_schema.resolve("values"));
 }
 

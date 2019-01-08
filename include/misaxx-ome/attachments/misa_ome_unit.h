@@ -65,6 +65,7 @@ namespace misaxx_ome {
         }
 
         void to_json_schema(const misaxx::misa_json_schema &t_schema) const override {
+            misaxx::misa_unit<Order>::to_json_schema(t_schema);
             misaxx::misa_json_property<std::string> meta;
             std::vector<std::string> units;
             for(const auto &kv : ome_unit_type::values()) {
