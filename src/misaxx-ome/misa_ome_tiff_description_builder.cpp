@@ -3,6 +3,7 @@
 #include <misaxx/runtime/misa_runtime_base.h>
 #include "io/ome_to_opencv.h"
 #include "io/opencv_to_ome.h"
+#include <misaxx/runtime/misa_runtime_properties.h>
 
 using namespace misaxx;
 using namespace misaxx_ome;

@@ -7,12 +7,13 @@
 #include <misaxx/runtime/misa_runtime_base.h>
 #include "io/ome_to_opencv.h"
 #include "io/opencv_to_ome.h"
+#include <misaxx/runtime/misa_runtime_properties.h>
 
 using namespace misaxx;
 using namespace misaxx_ome;
 
 misa_ome_tiff_description_modifier::misa_ome_tiff_description_modifier(misa_ome_tiff_description src) : m_result(std::move(src)) {
-    if(!misaxx::misa_runtime_base::instance().is_simulating()) {
+    if(!misaxx::runtime_properties::is_simulating()) {
         // Copy the metadata to allow derivation
         m_result.metadata = ome::files::createOMEXMLMetadata(m_result.metadata->dumpXML());
 
@@ -38,7 +39,7 @@ misa_ome_tiff_description_modifier::operator std::shared_ptr<misaxx::misa_descri
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::change_series(size_t series) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
     if(series >= m_result.metadata->getImageCount())
         throw std::runtime_error("The requested series does not exist");
@@ -51,7 +52,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::change_s
 
 misa_ome_tiff_description_modifier &
 misa_ome_tiff_description_modifier::pixel_channel_type(const ome::xml::model::enums::PixelType &t_pixel_type) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -61,7 +62,7 @@ misa_ome_tiff_description_modifier::pixel_channel_type(const ome::xml::model::en
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::pixel_channels(std::vector<size_t> channels) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -84,7 +85,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::pixel_ch
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::pixel_channels(size_t channels) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     std::vector<size_t> c = {channels};
@@ -93,7 +94,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::pixel_ch
 
 misa_ome_tiff_description_modifier &
 misa_ome_tiff_description_modifier::of(size_t channels, const ome::xml::model::enums::PixelType &t_pixel_type) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     pixel_channels(channels);
@@ -101,7 +102,7 @@ misa_ome_tiff_description_modifier::of(size_t channels, const ome::xml::model::e
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::of_opencv(int opencv_type) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     cv::Mat m(1, 1, opencv_type);
@@ -110,7 +111,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::of_openc
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::depth(size_t size) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -119,7 +120,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::depth(si
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::channels(size_t size, size_t num_channels) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -135,7 +136,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::channels
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::duration(size_t size) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -144,7 +145,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::duration
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::width(size_t size) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -153,7 +154,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::width(si
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::height(size_t size) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     change_series(m_series);
@@ -162,7 +163,7 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::height(s
 }
 
 misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::of_size(size_t w, size_t h) {
-    if(misaxx::misa_runtime_base::instance().is_simulating())
+    if(misaxx::runtime_properties::is_simulating())
         return *this;
 
     return width(w).height(h);
