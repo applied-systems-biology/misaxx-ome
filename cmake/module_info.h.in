@@ -1,3 +1,4 @@
+#pragma once
 #include <misaxx/misa_mutable_module_info.h>
 #include <misaxx/module_info.h>
 
