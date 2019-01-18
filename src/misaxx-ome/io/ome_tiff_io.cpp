@@ -1,5 +1,6 @@
 #include <misaxx-ome/io/ome_tiff_io.h>
 #include <misaxx-ome/descriptions/misa_ome_plane_description.h>
+#include <misaxx/utils/string.h>
 #include "ome_to_opencv.h"
 #include "opencv_to_ome.h"
 #include "ome_to_ome.h"
@@ -89,7 +90,7 @@ void misaxx_ome::ome_tiff_io::initialize_write_buffer_from_reader() const {
             for(size_t c = 0; c < size_C; ++c) {
                 for (size_t t = 0; t < size_T; ++t) {
                     const misa_ome_plane_description location(series, z, c, t);
-                    const auto location_name = cxxh::to_string(location);
+                    const auto location_name = misaxx::utils::to_string(location);
                     std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << std::endl;
 
                     auto writer = get_buffer_writer(location);
@@ -139,7 +140,7 @@ misaxx_ome::ome_tiff_io::get_buffer_reader(const misaxx_ome::misa_ome_plane_desc
 
 boost::filesystem::path
 misaxx_ome::ome_tiff_io::get_write_buffer_path(const misaxx_ome::misa_ome_plane_description &t_location) const {
-    return m_path.parent_path() / "__misa_ome_write_buffer__" / (m_path.filename().string() + "_" + cxxh::to_string(t_location) + ".ome.tif");
+    return m_path.parent_path() / "__misa_ome_write_buffer__" / (m_path.filename().string() + "_" + misaxx::utils::to_string(t_location) + ".ome.tif");
 }
 
 void misaxx_ome::ome_tiff_io::close_writer() const {

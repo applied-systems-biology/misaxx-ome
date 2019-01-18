@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(misaxx-ome VERSION 0.1.0 DESCRIPTION "MISA++ OME Integration")
 
 find_package(misaxx-core REQUIRED)
+find_package(misaxx-imaging REQUIRED)
 find_package(Boost 1.63 COMPONENTS REQUIRED log_setup log iostreams)
 find_package(Threads REQUIRED)
 find_package(OMEFiles 0.5.0 REQUIRED)
@@ -57,5 +58,4 @@ add_library(misaxx-ome
 misaxx_make_shared(misaxx misaxx-ome)
 misaxx_add_compiler_warnings(misaxx-ome)
 
-target_link_libraries(misaxx-ome PUBLIC OME::Files)
-target_link_libraries(misaxx-ome PUBLIC misaxx::misaxx-core)
+target_link_libraries(misaxx-ome PUBLIC OME::Files misaxx::misaxx-core misaxx::misaxx-imaging)

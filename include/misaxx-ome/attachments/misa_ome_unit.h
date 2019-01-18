@@ -15,7 +15,7 @@
 #include <ome/xml/model/enums/UnitsTime.h>
 #include <ome/xml/model/primitives/Quantity.h>
 #include <misaxx/attachments/misa_unit_numeric.h>
-#include <misaxx-helpers/string.h>
+#include <misaxx/utils/string.h>
 
 namespace misaxx_ome {
     template<size_t Order, class OMEUnit> struct misa_ome_unit : public misaxx::misa_unit<Order>,
@@ -46,7 +46,7 @@ namespace misaxx_ome {
                 return ome_unit_type::values().at(m_value);
             }
             else {
-                return ome_unit_type::values().at(m_value) + "^" + cxxh::to_string(Order);
+                return ome_unit_type::values().at(m_value) + "^" + misaxx::utils::to_string(Order);
             }
         }
 

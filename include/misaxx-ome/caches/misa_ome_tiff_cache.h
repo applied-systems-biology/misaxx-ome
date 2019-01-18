@@ -20,7 +20,7 @@ namespace misaxx_ome {
      * Cache that allows read and write access to an OME TIFF
      * @tparam Image cv::Mat or a coixx::image
      */
-    template<class Image = cv::Mat> class misa_ome_tiff_cache : public misaxx::misa_default_cache<cxxh::memory_cache<std::vector<misa_ome_plane<Image>>>,
+    template<class Image = cv::Mat> class misa_ome_tiff_cache : public misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane<Image>>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description> {
     public:
 
@@ -103,7 +103,7 @@ namespace misaxx_ome {
         }
 
         void postprocess() override {
-            misaxx::misa_default_cache<cxxh::memory_cache<std::vector<misa_ome_plane<Image>>>,
+            misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane<Image>>>,
                     misa_ome_tiff_pattern, misa_ome_tiff_description>::postprocess();
             // Close the TIFF
             m_tiff->close();

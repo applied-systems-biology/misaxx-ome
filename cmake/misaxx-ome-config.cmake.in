@@ -1,6 +1,7 @@
 @PACKAGE_INIT@
 
 find_package(misaxx-core REQUIRED)
+find_package(misaxx-imaging REQUIRED)
 find_package(Boost 1.63 COMPONENTS REQUIRED log_setup log iostreams)
 find_package(Threads REQUIRED)
 

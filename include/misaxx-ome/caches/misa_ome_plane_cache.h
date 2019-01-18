@@ -6,11 +6,10 @@
 #pragma once
 #include <misaxx/misa_cache.h>
 #include <misaxx/misa_manual_cache.h>
-#include <misaxx-helpers/cache.h>
-#include <misaxx-helpers/string.h>
+#include <misaxx/utils/string.h>
 #include <opencv2/opencv.hpp>
 #include <ome/files/in/OMETIFFReader.h>
-#include <misaxx-coixx/toolbox/toolbox_opencv.h>
+#include <misaxx-imaging/coixx/toolbox/toolbox_opencv.h>
 #include <misaxx/misa_default_cache.h>
 #include <misaxx-ome/io/ome_tiff_io.h>
 #include <misaxx-ome/descriptions/misa_ome_plane_description.h>
@@ -22,7 +21,7 @@ namespace misaxx_ome {
      * The plane is accessed via a misa_ome_plane_location that indicates where the 2D image data is located within the TIFF file.
      * @tparam Image cv::Mat or a coixx::image
      */
-    template<class Image = cv::Mat> struct misa_ome_plane_cache : public misaxx::misa_manual_cache<cxxh::cache<Image>, misa_ome_plane_description> {
+    template<class Image = cv::Mat> struct misa_ome_plane_cache : public misaxx::misa_manual_cache<misaxx::utils::cache<Image>, misa_ome_plane_description> {
         Image &get() override {
             return m_cached_image;
         }
@@ -85,7 +84,7 @@ namespace misaxx_ome {
             if(!static_cast<bool>(m_tiff)) {
                 throw std::runtime_error("Cannot link OME TIFF plane without a TIFF IO!");
             }
-            this->set_unique_location(this->get_location() / "planes" /  (cxxh::to_string(t_description) + ".tif"));
+            this->set_unique_location(this->get_location() / "planes" /  (misaxx::utils::to_string(t_description) + ".tif"));
             std::cout << "[Cache] Linking OME TIFF plane @ " << t_description << std::endl;
         }
 

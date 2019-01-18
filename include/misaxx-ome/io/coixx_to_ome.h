@@ -6,7 +6,7 @@
 #pragma once
 
 #include <ome/xml/model/enums/PixelType.h>
-#include <misaxx-helpers/type_traits.h>
+#include <misaxx/utils/type_traits.h>
 
 namespace misaxx_ome {
 
@@ -43,7 +43,7 @@ namespace misaxx_ome {
             return ome::xml::model::enums::PixelType::DOUBLE;
         }
         else {
-            static_assert(cxxh::always_false<Image>::value, "Unsupported image type!");
+            static_assert(misaxx::utils::always_false<Image>::value, "Unsupported image type!");
         }
     }
 

@@ -13,12 +13,10 @@
 #include <ome/xml/meta/Convert.h>
 #include <opencv2/opencv.hpp>
 #include <boost/filesystem.hpp>
-#include <misaxx-helpers/cache.h>
-#include <misaxx-helpers/string.h>
+#include <misaxx/misa_cache.h>
 #include <boost/regex.hpp>
 #include <misaxx-ome/ome_helpers.h>
 #include <ome/files/MetadataTools.h>
-#include <misaxx-helpers/cache/locked.h>
 
 namespace misaxx_ome {
 
@@ -51,8 +49,8 @@ namespace misaxx_ome {
     class ome_tiff_io {
     public:
 
-        using locked_reader_type = cxxh::locked<std::shared_ptr<ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
-        using locked_writer_type = cxxh::locked<std::shared_ptr<ome::files::out::OMETIFFWriter>, std::unique_lock<std::shared_mutex>>;
+        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
+        using locked_writer_type = misaxx::utils::locked<std::shared_ptr<ome::files::out::OMETIFFWriter>, std::unique_lock<std::shared_mutex>>;
 
         ome_tiff_io() = default;
 
