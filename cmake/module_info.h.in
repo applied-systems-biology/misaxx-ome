@@ -1,7 +1,7 @@
 #pragma once
 #include <misaxx/misa_mutable_module_info.h>
 #include <misaxx/module_info.h>
-#include <misaxx_imaging/module_info.h>
+#include <misaxx-imaging/module_info.h>
 
 namespace misaxx_ome {
     inline misaxx::misa_module_info module_info() {
