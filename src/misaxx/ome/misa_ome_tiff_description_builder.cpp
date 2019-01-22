@@ -14,6 +14,9 @@ misa_ome_tiff_description_builder::misa_ome_tiff_description_builder(misa_ome_ti
             m_series_list.emplace_back(helpers::create_ome_core_metadata(*m_result.metadata, series));
         }
     }
+    else {
+        m_result.metadata = std::make_shared<::ome::xml::meta::OMEXMLMetadata>();
+    }
 }
 
 misa_ome_tiff_description_builder::operator misa_ome_tiff_description() {
