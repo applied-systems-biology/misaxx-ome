@@ -159,8 +159,8 @@ namespace misaxx::ome {
             typename Value = typename Quantity::value_type,
             class Unit = typename Quantity::unit_type,
             class OMEUnit = typename Unit::ome_unit_type>
-    inline ::ome::xml::model::primitives::Quantity<Unit, Value> misa_to_ome(const Quantity &t_quantity) {
-        return ::ome::xml::model::primitives::Quantity<Unit, Value>(t_quantity.get_value(),
+    inline ::ome::xml::model::primitives::Quantity<OMEUnit, Value> misa_to_ome(const Quantity &t_quantity) {
+        return ::ome::xml::model::primitives::Quantity<OMEUnit, Value>(t_quantity.get_value(),
                 t_quantity.get_unit().get_ome_unit());
     }
 }
