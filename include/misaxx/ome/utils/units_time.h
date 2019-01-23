@@ -11,7 +11,7 @@ namespace misaxx::ome::units {
     template<int Order = 1> misa_ome_unit_time<Order> yottasecond() {
         return misa_ome_unit_time<Order>(::ome::xml::model::enums::UnitsTime::YOTTASECOND);
     }
-    
+
     template<int Order = 1> misa_ome_unit_time<Order> zettasecond() {
         return misa_ome_unit_time<Order>(::ome::xml::model::enums::UnitsTime::ZETTASECOND);
     }
