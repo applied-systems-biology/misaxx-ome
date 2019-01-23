@@ -53,7 +53,7 @@ add_library(misaxx-imaging-ome
         src/misaxx/ome/attachments/misa_ome_pixel_count.cpp
         include/misaxx/ome/attachments/misa_ome_pixel_count.h
         src/misaxx/ome/attachments/misa_ome_voxel.cpp
-        include/misaxx/ome/attachments/misa_ome_voxel.h)
+        include/misaxx/ome/attachments/misa_ome_voxel.h include/misaxx/ome/utils/units_length.h include/misaxx/ome/utils/units_electric_potential.h include/misaxx/ome/utils/units_frequency.h include/misaxx/ome/utils/units_power.h include/misaxx/ome/utils/units_pressure.h include/misaxx/ome/utils/units_temperature.h include/misaxx/ome/utils/units_time.h)
 
 set(MISAXX_LIBRARY misaxx-imaging-ome)
 set(MISAXX_LIBRARY_NAMESPACE misaxx::)
