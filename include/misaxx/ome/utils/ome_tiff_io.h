@@ -176,20 +176,6 @@ namespace misaxx::ome {
          */
         boost::filesystem::path get_write_buffer_path(const misa_ome_plane_description &t_location) const;
 
-        /**
-         * Returns the OME TIFF reader for a read buffer
-         * @param t_location
-         * @return
-         */
-        std::shared_ptr<::ome::files::in::OMETIFFReader> get_buffer_reader(const misa_ome_plane_description &t_location) const;
-
-        /**
-         * Returns the OME TIFF writer for a write buffer
-         * @param t_location
-         * @return
-         */
-        std::shared_ptr<::ome::files::out::OMETIFFWriter> get_buffer_writer(const misa_ome_plane_description &t_location) const;
-
        /**
         * Copies all TIFF images stored inside the current reader into the buffer directory
         */
@@ -201,12 +187,5 @@ namespace misaxx::ome {
         * @return
         */
         locked_reader_type get_reader(const misa_ome_plane_description &t_location) const;
-
-        /**
-        * Thread-safe access to the managed writer
-        * The writer is unique-locked (sequential access!)
-        * @return
-        */
-        locked_writer_type get_writer(const misa_ome_plane_description &t_location) const;
     };
 }
