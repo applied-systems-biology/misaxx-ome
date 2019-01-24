@@ -75,7 +75,7 @@ namespace misaxx::ome {
             else {
                 if (m_cached_image.is_empty())
                     throw std::runtime_error("Trying to write empty image to TIFF!");
-                m_tiff->write_plane(m_cached_image.get_image(), get_plane_location());
+                m_tiff->write_plane(m_cached_image.get_mat(), get_plane_location());
             }
         }
 
