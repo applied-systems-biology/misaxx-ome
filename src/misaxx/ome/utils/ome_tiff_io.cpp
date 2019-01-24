@@ -7,7 +7,7 @@
 
 
 misaxx::ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path) : m_path(std::move(t_path)) {
-    if (!boost::filesystem::is_regular_file(m_path)) {
+    if (!boost::filesystem::exists(m_path)) {
         throw std::runtime_error("Cannot read from non-existing file " + m_path.string());
     }
 }
@@ -16,7 +16,7 @@ misaxx::ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path,
                                      std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> t_metadata) : m_path(
         std::move(t_path)), m_metadata(std::move(t_metadata)) {
     // We can load metadata from the file if it exists
-    if (boost::filesystem::is_regular_file(m_path)) {
+    if (boost::filesystem::exists(m_path)) {
         m_metadata.reset();
     }
 }
@@ -33,7 +33,7 @@ misaxx::ome::ome_tiff_io::get_writer(const misaxx::ome::misa_ome_plane_descripti
 
     // If the current TIFF file exists, set it to a reader->writer connection
     // This will preserve the TIFF data that is already written
-    if(boost::filesystem::is_regular_file(m_path) && m_write_buffer.empty()) {
+    if(boost::filesystem::exists(m_path) && m_write_buffer.empty()) {
         if(!static_cast<bool>(m_reader)) {
             open_reader();
         }
@@ -236,5 +236,46 @@ void misaxx::ome::ome_tiff_io::write_plane(const cv::Mat &image, const misaxx::o
     auto writer = get_writer(index);
     opencv_to_ome(image, *writer.value, misa_ome_plane_description(0, 0, 0, 0));
     writer.value->close();
+}
+
+boost::filesystem::path misaxx::ome::ome_tiff_io::get_base_filename() const {
+    auto base_name = m_path.filename();
+    for(int i = 0; i < 2 && base_name.has_extension(); ++i) {
+        base_name.replace_extension();
+    }
+    return base_name;
+}
+
+::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_num_series() const {
+    return get_metadata()->getImageCount();
+}
+
+::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_x(::ome::files::dimension_size_type series) const {
+    return get_metadata()->getPixelsSizeX(series);
+}
+
+::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_y(::ome::files::dimension_size_type series) const {
+    return get_metadata()->getPixelsSizeY(series);
+}
+
+::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_z(::ome::files::dimension_size_type series) const {
+    return get_metadata()->getPixelsSizeZ(series);
+}
+
+::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_t(::ome::files::dimension_size_type series) const {
+    return get_metadata()->getPixelsSizeT(series);
+}
+
+::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_c(::ome::files::dimension_size_type series) const {
+    return get_metadata()->getChannelCount(series);
+}
+
+::ome::files::dimension_size_type
+misaxx::ome::ome_tiff_io::get_num_planes(::ome::files::dimension_size_type series) const {
+    return get_size_c(series) * get_size_t(series) * get_size_z(series);
+}
+
+boost::filesystem::path misaxx::ome::ome_tiff_io::get_path() const {
+    return m_path;
 }
 

@@ -32,7 +32,7 @@ namespace misaxx::ome {
             // We do cache initialization during linkage
             this->set_unique_location(this->get_location() / t_description.filename);
 
-            if(boost::filesystem::is_regular_file(this->get_unique_location())) {
+            if(boost::filesystem::exists(this->get_unique_location())) {
                 std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << std::endl;
                 m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location());
 

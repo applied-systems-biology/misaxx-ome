@@ -86,9 +86,7 @@ namespace misaxx::ome {
          */
         std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_metadata() const;
 
-        boost::filesystem::path get_path() const {
-            return m_path;
-        }
+        boost::filesystem::path get_path() const;
 
         /**
          * Closes any open reader and writer. This method is thread-safe.
@@ -99,63 +97,49 @@ namespace misaxx::ome {
          * The number of image series
          * @return
          */
-        ::ome::files::dimension_size_type get_num_series() const {
-            return get_metadata()->getImageCount();
-        }
+        ::ome::files::dimension_size_type get_num_series() const;
 
         /**
          * The width of each plane
          * @param series
          * @return
          */
-        ::ome::files::dimension_size_type get_size_x(::ome::files::dimension_size_type series) const {
-            return get_metadata()->getPixelsSizeX(series);
-        }
+        ::ome::files::dimension_size_type get_size_x(::ome::files::dimension_size_type series) const;
 
         /**
          * The height of each plane
          * @param series
          * @return
          */
-        ::ome::files::dimension_size_type get_size_y(::ome::files::dimension_size_type series) const {
-            return get_metadata()->getPixelsSizeY(series);
-        }
+        ::ome::files::dimension_size_type get_size_y(::ome::files::dimension_size_type series) const;
 
         /**
          * Planes located in depth axis
          * @param series
          * @return
          */
-        ::ome::files::dimension_size_type get_size_z(::ome::files::dimension_size_type series) const {
-            return get_metadata()->getPixelsSizeZ(series);
-        }
+        ::ome::files::dimension_size_type get_size_z(::ome::files::dimension_size_type series) const;
 
         /**
          * Planes located in time axis
          * @param series
          * @return
          */
-        ::ome::files::dimension_size_type get_size_t(::ome::files::dimension_size_type series) const {
-            return get_metadata()->getPixelsSizeT(series);
-        }
+        ::ome::files::dimension_size_type get_size_t(::ome::files::dimension_size_type series) const;
 
         /**
          * Planes located in channel axis (this is the same as OME's effectiveSizeC)
          * @param series
          * @return
          */
-        ::ome::files::dimension_size_type get_size_c(::ome::files::dimension_size_type series) const {
-            return get_metadata()->getChannelCount(series);
-        }
+        ::ome::files::dimension_size_type get_size_c(::ome::files::dimension_size_type series) const;
 
         /**
          * Number of planes (Z * C * T)
          * @param series
          * @return
          */
-        ::ome::files::dimension_size_type get_num_planes(::ome::files::dimension_size_type series) const {
-            return get_size_c(series) * get_size_t(series) * get_size_z(series);
-        }
+        ::ome::files::dimension_size_type get_num_planes(::ome::files::dimension_size_type series) const;
 
     private:
 
@@ -177,13 +161,7 @@ namespace misaxx::ome {
          * Returns the filename of the path without .ome.tif extension
          * @return
          */
-        boost::filesystem::path get_base_filename() const {
-            auto base_name = m_path.filename();
-            for(int i = 0; i < 2 && base_name.has_extension(); ++i) {
-                base_name.replace_extension();
-            }
-            return base_name;
-        }
+        boost::filesystem::path get_base_filename() const;
 
         void open_reader() const;
 
