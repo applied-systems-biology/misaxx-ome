@@ -90,7 +90,7 @@ void misaxx::ome::ome_tiff_io::close_writer() const {
     auto writer = std::make_shared<::ome::files::out::OMETIFFWriter>();
     auto metadata = std::static_pointer_cast<::ome::xml::meta::MetadataRetrieve>(m_metadata);
     writer->setMetadataRetrieve(metadata);
-    writer->setInterleaved(false);
+    writer->setBigTIFF(true);
     writer->setId(m_path);
 
     for(const auto &kv : m_write_buffer) {
