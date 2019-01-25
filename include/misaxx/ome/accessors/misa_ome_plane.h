@@ -13,59 +13,47 @@ namespace misaxx::ome {
      * A 2D image (plane) stored inside an OME TIFF file.
      * @tparam Image cv::Mat or a coixx::image
      */
-    template<class Image = cv::Mat> struct misa_ome_plane : public misaxx::misa_cached_data<misa_ome_plane_cache<Image>>,
-                            public misaxx::misa_description_accessors_from_cache<misa_ome_plane_cache<Image>, misa_ome_plane<Image>> {
+    struct misa_ome_plane : public misaxx::misa_cached_data<misa_ome_plane_cache>,
+                            public misaxx::misa_description_accessors_from_cache<misa_ome_plane_cache, misa_ome_plane> {
 
         /**
          * Clones the image stored in this OME TIFF plane
          * @return
          */
-        Image clone() const {
-            return this->access_readonly().get().clone();
-        }
+        cv::Mat clone() const;
 
         /**
          * Writes data into this OME TIFF plane
          * @param t_cache
          * @param t_data
          */
-        void write(Image t_data) {
-            this->access_write().set(std::move(t_data));
-        }
+        void write(cv::Mat t_data);
 
         /**
          * Returns the location of this plane within the TIFF file
          * @return
          */
-        const misa_ome_plane_description &get_plane_location() const {
-            return this->data->get_plane_location();
-        }
+        const misa_ome_plane_description &get_plane_location() const;
 
         /**
          * Width of this plane
          * @param series
          * @return
          */
-        size_t get_size_x() const {
-            return this->data->get_tiff_io()->get_size_x(get_plane_location().series);
-        }
+        size_t get_size_x() const;
 
         /**
          * Height of this plane
          * @param series
          * @return
          */
-        size_t get_size_y() const {
-            return this->data->get_tiff_io()->get_size_y(get_plane_location().series);
-        }
+        size_t get_size_y() const;
 
         /**
          * Returns the OME TIFF metadata storage
          * @return
          */
-        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const {
-            return this->data->get_tiff_io()->get_metadata();
-        }
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const;
     };
 }
 

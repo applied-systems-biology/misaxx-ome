@@ -16,70 +16,48 @@ namespace misaxx::ome {
      * that also encodes semantic location within a time/depth/channel space.
      * @tparam Image cv::Mat or a coixx::image
      */
-    template<class Image = cv::Mat> struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache<Image>>,
-                           public misaxx::misa_description_accessors_from_cache<misa_ome_tiff_cache<Image>, misa_ome_tiff<Image>> {
+    struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache>,
+                           public misaxx::misa_description_accessors_from_cache<misa_ome_tiff_cache, misa_ome_tiff> {
 
-        using iterator = typename std::vector<misa_ome_plane<Image>>::iterator;
-        using const_iterator = typename std::vector<misa_ome_plane<Image>>::const_iterator;
+        using iterator = typename std::vector<misa_ome_plane>::iterator;
+        using const_iterator = typename std::vector<misa_ome_plane>::const_iterator;
 
-        iterator begin() {
-            return this->data->get().begin();
-        }
+        iterator begin();
 
-        iterator end() {
-            return this->data->get().end();
-        }
+        iterator end();
 
-        const_iterator begin() const {
-            return this->data->get().begin();
-        }
+        const_iterator begin() const;
 
-        const_iterator end() const {
-            return this->data->get().end();
-        }
+        const_iterator end() const;
 
-        size_t size() const {
-            return this->data->get().size();
-        }
+        size_t size() const;
 
-        bool empty() const {
-            return this->data->get().empty();
-        }
+        bool empty() const;
 
-        misa_ome_plane<Image> at(size_t index) const {
-            return this->data->get().at(index);
-        }
+        misa_ome_plane at(size_t index) const;
 
-        misa_ome_plane<Image> at(const misa_ome_plane_description &index) {
-            return this->data->get_plane(index);
-        }
+        misa_ome_plane at(const misa_ome_plane_description &index);
 
         /**
          * Width of each plane in the TIFF
          * @param series
          * @return
          */
-        size_t get_size_x(size_t series = 0) const {
-            return this->data->get_tiff_io()->get_size_x(series);
-        }
+        size_t get_size_x(size_t series = 0) const;
 
         /**
          * Height of each plane in the TIFF
          * @param series
          * @return
          */
-        size_t get_size_y(size_t series = 0) const {
-            return this->data->get_tiff_io()->get_size_y(series);
-        }
+        size_t get_size_y(size_t series = 0) const;
 
         /**
          * Number of planes allocated within the time axis
          * @param series
          * @return
          */
-        size_t get_size_t(size_t series = 0) const {
-            return this->data->get_tiff_io()->get_size_t(series);
-        }
+        size_t get_size_t(size_t series = 0) const;
 
         /**
          * Number of planes allocated within the channel axis
@@ -87,35 +65,27 @@ namespace misaxx::ome {
          * @param series
          * @return
          */
-        size_t get_size_c(size_t series = 0) const {
-            return this->data->get_tiff_io()->get_size_c(series);
-        }
+        size_t get_size_c(size_t series = 0) const;
 
         /**
          * Number of planes allocated within the depth axis
          * @param series
          * @return
          */
-        size_t get_size_z(size_t series = 0) const {
-            return this->data->get_tiff_io()->get_size_z(series);
-        }
+        size_t get_size_z(size_t series = 0) const;
 
         /**
          * Returns a description builder that allows changing properties of the description more easily
          * The description builder works on a copy
          * @return
          */
-        misa_ome_tiff_description_modifier derive() const {
-            return misa_ome_tiff_description_modifier(this->get_data_description());
-        }
+        misa_ome_tiff_description_modifier derive() const;
 
         /**
          * Returns the OME TIFF metadata storage
          * @return
          */
-        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const {
-            return this->data->get_tiff_io()->get_metadata();
-        }
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_ome_metadata() const;
 
         /**
          * Creates a builder that allows creating a TIFF description from scratch
@@ -124,9 +94,7 @@ namespace misaxx::ome {
          * @param src Optional source description
          * @return
          */
-        static misa_ome_tiff_description_builder build(misa_ome_tiff_description src = misa_ome_tiff_description("image.ome.tif")) {
-            return misa_ome_tiff_description_builder(std::move(src));
-        }
+        static misa_ome_tiff_description_builder build(misa_ome_tiff_description src = misa_ome_tiff_description("image.ome.tif"));
     };
 }
 
