@@ -3,7 +3,7 @@
 find_package(misaxx-core REQUIRED)
 find_package(misaxx-static-opencv REQUIRED)
 find_package(misaxx-imaging REQUIRED)
-find_package(Boost 1.63 COMPONENTS REQUIRED log_setup log iostreams)
+find_package(Boost 1.63 COMPONENTS REQUIRED system log_setup log iostreams)
 find_package(Threads REQUIRED)
 
 # OME files cannot be called multiple times
