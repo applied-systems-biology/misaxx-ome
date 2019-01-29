@@ -1,5 +1,7 @@
 #include <misaxx/ome/caches/misa_ome_tiff_cache.h>
 #include <misaxx/ome/attachments/misa_ome_planes_location.h>
+#include <misaxx/core/runtime/misa_parameter_registry.h>
+#include <misaxx/ome/utils/ome_tiff_io.h>
 
 void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_description &t_description) {
 
@@ -71,8 +73,10 @@ misaxx::ome::misa_ome_tiff_cache::get_plane(const misaxx::ome::misa_ome_plane_de
 void misaxx::ome::misa_ome_tiff_cache::postprocess() {
     misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description>::postprocess();
+    bool remove_write_buffer = misaxx::parameter_registry::get_json({"runtime", "misaxx-ome:remove-write-buffer"},
+                                                                    misaxx::misa_json_property<bool>().with_default_value(true));
     // Close the TIFF
-    m_tiff->close();
+    m_tiff->close(remove_write_buffer);
 }
 
 misaxx::ome::misa_ome_tiff_description
@@ -94,4 +98,12 @@ std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_tiff_cache::create_
     }
 
     return result;
+}
+
+void misaxx::ome::misa_ome_tiff_cache::simulate_link() {
+    misa_default_cache::simulate_link();
+
+    // Declare runtime parameter misaxx-ome:remove-write-buffer
+    misaxx::parameter_registry::register_parameter({ "runtime", "misaxx-ome:remove-write-buffer" },
+            misaxx::misa_json_property<bool>().with_default_value(true));
 }

@@ -40,7 +40,7 @@ misaxx::ome::ome_tiff_io::get_reader(const misaxx::ome::misa_ome_plane_descripti
         lock.unlock();
         wlock.lock();
         if(!m_write_buffer.empty()) {
-            close_writer();
+            close_writer(true);
         }
         open_reader();
         wlock.unlock();
@@ -84,7 +84,7 @@ misaxx::ome::ome_tiff_io::get_write_buffer_path(const misaxx::ome::misa_ome_plan
     return m_path.parent_path() / "__misa_ome_write_buffer__" / (m_path.filename().string() + "_" + misaxx::utils::to_string(t_location) + ".ome.tif");
 }
 
-void misaxx::ome::ome_tiff_io::close_writer() const {
+void misaxx::ome::ome_tiff_io::close_writer(bool remove_write_buffer) const {
     std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << std::endl;
     // Save the write buffer files into the path
     auto writer = std::make_shared<::ome::files::out::OMETIFFWriter>();
@@ -97,6 +97,11 @@ void misaxx::ome::ome_tiff_io::close_writer() const {
         std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << kv.first << std::endl;
         cv::Mat tmp = misaxx::imaging::utils::tiffread(kv.second);
         opencv_to_ome(tmp, *writer, kv.first);
+
+        // Remove write buffer if requested
+        if(remove_write_buffer) {
+            boost::filesystem::remove(kv.second);
+        }
     }
 
     writer->close();
@@ -131,14 +136,14 @@ void misaxx::ome::ome_tiff_io::open_reader() const {
     }
 }
 
-void misaxx::ome::ome_tiff_io::close() {
+void misaxx::ome::ome_tiff_io::close(bool remove_write_buffer) {
     std::unique_lock<std::shared_mutex> wlock(m_mutex, std::defer_lock);
     wlock.lock();
     if(static_cast<bool>(m_reader)) {
         close_reader();
     }
     if(!m_write_buffer.empty()) {
-        close_writer();
+        close_writer(remove_write_buffer);
     }
 }
 

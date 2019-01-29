@@ -91,7 +91,7 @@ namespace misaxx::ome {
         /**
          * Closes any open reader and writer. This method is thread-safe.
          */
-        void close();
+        void close(bool remove_write_buffer = true);
 
         /**
          * The number of image series
@@ -167,7 +167,7 @@ namespace misaxx::ome {
 
         void close_reader() const;
 
-        void close_writer() const;
+        void close_writer(bool remove_write_buffer) const;
 
         /**
          * Returns the write buffer path for a location

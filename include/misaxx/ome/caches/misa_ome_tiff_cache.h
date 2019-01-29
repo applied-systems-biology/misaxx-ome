@@ -11,10 +11,11 @@
 #include <misaxx/ome/patterns/misa_ome_tiff_pattern.h>
 #include <misaxx/ome/descriptions/misa_ome_tiff_description.h>
 #include <misaxx/core/misa_cached_data.h>
-#include <misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/ome/accessors/misa_ome_plane.h>
 
 namespace misaxx::ome {
+
+    struct ome_tiff_io;
 
     /**
      * Cache that allows read and write access to an OME TIFF
@@ -23,6 +24,8 @@ namespace misaxx::ome {
     class misa_ome_tiff_cache : public misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description> {
     public:
+
+        void simulate_link() override;
 
         void do_link(const misa_ome_tiff_description &t_description) override;
 
