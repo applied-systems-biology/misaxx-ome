@@ -56,12 +56,12 @@ void misa_ome_voxel_size::from_json(const nlohmann::json &t_json) {
 }
 
 void misa_ome_voxel_size::to_json(nlohmann::json &t_json) const {
-    misa_serializeable::to_json(t_json);
+    misa_serializable::to_json(t_json);
     values.to_json(t_json["values"]);
 }
 
 void misa_ome_voxel_size::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
-    misa_serializeable::to_json_schema(t_schema);
+    misa_serializable::to_json_schema(t_schema);
     values.to_json_schema(t_schema.resolve("values"));
 }
 
@@ -71,7 +71,7 @@ bool misa_ome_voxel_size::operator==(const misa_ome_voxel_size &rhs) const {
 }
 
 void misa_ome_voxel_size::build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const {
-    misa_serializeable::build_serialization_id_hierarchy(result);
+    misa_serializable::build_serialization_id_hierarchy(result);
     result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/voxel-size"));
 }
 

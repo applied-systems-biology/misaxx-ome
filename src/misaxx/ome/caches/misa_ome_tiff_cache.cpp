@@ -1,4 +1,5 @@
 #include <misaxx/ome/caches/misa_ome_tiff_cache.h>
+#include <misaxx/ome/attachments/misa_ome_planes_location.h>
 
 void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_description &t_description) {
 
@@ -80,5 +81,17 @@ misaxx::ome::misa_ome_tiff_cache::produce_description(const boost::filesystem::p
     auto file_description = t_pattern.produce(t_location);
     misa_ome_tiff_description result;
     result.filename = file_description.filename;
+    return result;
+}
+
+std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_tiff_cache::create_location_interface() const {
+    auto result = std::make_shared<misaxx::ome::misa_ome_planes_location>();
+    result->filesystem_location = get_location();
+    result->filesystem_unique_location = get_unique_location();
+
+    for(const auto &plane : this->get()) {
+        result->planes.push_back(plane.get_plane_location());
+    }
+
     return result;
 }

@@ -13,7 +13,7 @@ namespace misaxx::ome {
     /**
      * Higher-order wrapper around a vector of 3 length-unit values, modelling the size of a voxel
      */
-    struct misa_ome_voxel_size : public misaxx::misa_serializeable, public boost::equality_comparable<misa_ome_voxel_size> {
+    struct misa_ome_voxel_size : public misaxx::misa_serializable, public boost::equality_comparable<misa_ome_voxel_size> {
 
         using matrix_type = misaxx::misa_vector<double, misaxx::ome::misa_ome_unit_length <1>, 3>;
         using unit_type = misaxx::ome::misa_ome_unit_length<1>;

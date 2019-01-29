@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <misaxx/core/misa_serializeable.h>
+#include <misaxx/core/attachments/misa_locatable.h>
 #include <misaxx/core/attachments/misa_quantity.h>
 #include <misaxx/ome/attachments/misa_ome_unit.h>
 #include <misaxx/ome/attachments/misa_ome_voxel_size.h>
@@ -14,7 +14,7 @@ namespace misaxx::ome {
      * Higher-order wrapper around a number that is modeling the number of pixels
      * Can interact with misa_ome_voxel_size to calculate a misa_ome_volume
      */
-    struct misa_ome_pixel_count : public misaxx::misa_serializeable, public boost::equality_comparable<misa_ome_pixel_count> {
+    struct misa_ome_pixel_count : public misaxx::misa_locatable, public boost::equality_comparable<misa_ome_pixel_count> {
         long count = 0;
 
         misa_ome_pixel_count() = default;

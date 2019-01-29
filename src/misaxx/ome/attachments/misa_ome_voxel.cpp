@@ -133,17 +133,17 @@ void misa_ome_voxel::from_json(const nlohmann::json &t_json) {
 }
 
 void misa_ome_voxel::to_json(nlohmann::json &t_json) const {
-    misa_serializeable::to_json(t_json);
+    misa_serializable::to_json(t_json);
     ranges.to_json(t_json["ranges"]);
 }
 
 void misa_ome_voxel::to_json_schema(const misa_json_schema &t_schema) const {
-    misa_serializeable::to_json_schema(t_schema);
+    misa_serializable::to_json_schema(t_schema);
     ranges.to_json_schema(t_schema.resolve("ranges"));
 }
 
 void misa_ome_voxel::build_serialization_id_hierarchy(std::vector<misa_serialization_id> &result) const {
-    misa_serializeable::build_serialization_id_hierarchy(result);
+    misa_serializable::build_serialization_id_hierarchy(result);
     result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/voxel"));
 }
 

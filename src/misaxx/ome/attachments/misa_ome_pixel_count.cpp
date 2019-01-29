@@ -15,17 +15,17 @@ void misa_ome_pixel_count::from_json(const nlohmann::json &t_json) {
 }
 
 void misa_ome_pixel_count::to_json(nlohmann::json &t_json) const {
-    misa_serializeable::to_json(t_json);
+    misa_locatable::to_json(t_json);
     t_json["count"] = count;
 }
 
 void misa_ome_pixel_count::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
-    misa_serializeable::to_json_schema(t_schema);
+    misa_locatable::to_json_schema(t_schema);
     t_schema.resolve("count").declare_required<long>();
 }
 
 void misa_ome_pixel_count::build_serialization_id_hierarchy(std::vector<misa_serialization_id> &result) const {
-    misa_serializeable::build_serialization_id_hierarchy(result);
+    misa_locatable::build_serialization_id_hierarchy(result);
     result.emplace_back(misa_serialization_id("misa_ome", "attachments/pixel-count"));
 }
 

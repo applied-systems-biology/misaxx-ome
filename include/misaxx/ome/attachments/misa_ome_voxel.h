@@ -14,7 +14,7 @@ namespace misaxx::ome {
      * Models a cuboid 3D voxel
      * The 'from' point is inclusive, while the 'to' point is exclusive
      */
-    struct misa_ome_voxel : public misaxx::misa_serializeable {
+    struct misa_ome_voxel : public misaxx::misa_serializable {
         using matrix_type = misaxx::misa_matrix<double, misaxx::ome::misa_ome_unit_length <1>, 3, 2>;
         using unit_type = misaxx::ome::misa_ome_unit_length<1>;
         using ome_unit_type = typename unit_type::ome_unit_type;

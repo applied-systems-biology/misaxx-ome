@@ -45,6 +45,9 @@ namespace misaxx::ome {
         void postprocess() override;
 
     protected:
+        std::shared_ptr<misa_location> create_location_interface() const override;
+
+    protected:
         misa_ome_tiff_description produce_description(const boost::filesystem::path &t_location,
                                                       const misa_ome_tiff_pattern &t_pattern) override;
 

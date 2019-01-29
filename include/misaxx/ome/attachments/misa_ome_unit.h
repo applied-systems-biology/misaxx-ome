@@ -59,7 +59,7 @@ namespace misaxx::ome {
         }
 
         void to_json(nlohmann::json &t_json) const override {
-            misaxx::misa_serializeable::to_json(t_json);
+            misaxx::misa_serializable::to_json(t_json);
             t_json["unit"] = static_cast<std::string>(m_value);
             t_json["order"] = Order;
         }
@@ -78,7 +78,7 @@ namespace misaxx::ome {
 
     protected:
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override {
-            misaxx::misa_serializeable::build_serialization_id_hierarchy(result);
+            misaxx::misa_serializable::build_serialization_id_hierarchy(result);
             if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsLength>::value) {
                 result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/length"));
             }

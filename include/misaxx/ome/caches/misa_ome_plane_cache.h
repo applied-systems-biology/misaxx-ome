@@ -50,6 +50,9 @@ namespace misaxx::ome {
          */
         const misa_ome_plane_description &get_plane_location() const;
 
+    protected:
+        std::shared_ptr<misa_location> create_location_interface() const override;
+
     private:
         std::shared_ptr<ome_tiff_io> m_tiff;
         cv::Mat m_cached_image;
