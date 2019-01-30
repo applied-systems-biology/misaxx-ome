@@ -2,6 +2,7 @@
 #include <misaxx/ome/descriptions/misa_ome_plane_description.h>
 #include <misaxx/core/utils/string.h>
 #include <misaxx/imaging/utils/tiffio.h>
+#include <opencv2/opencv.hpp>
 #include "ome_to_opencv.h"
 #include "opencv_to_ome.h"
 #include "ome_to_ome.h"
@@ -180,6 +181,12 @@ void misaxx::ome::ome_tiff_io::write_plane(const cv::Mat &image, const misaxx::o
 
     if(index.series != 0)
         throw std::runtime_error("Only series 0 is currently supported!");
+
+    // If the file already exists, we have to create a write buffer
+    if(m_write_buffer.empty() && boost::filesystem::exists(m_path)) {
+        initialize_write_buffer_from_reader();
+    }
+
     const boost::filesystem::path buffer_path = get_write_buffer_path(index);
     if(!boost::filesystem::is_directory(buffer_path.parent_path())) {
         boost::filesystem::create_directories(buffer_path.parent_path());
