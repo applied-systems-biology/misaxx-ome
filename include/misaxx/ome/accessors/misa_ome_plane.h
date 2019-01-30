@@ -11,7 +11,6 @@
 namespace misaxx::ome {
     /**
      * A 2D image (plane) stored inside an OME TIFF file.
-     * @tparam Image cv::Mat or a coixx::image
      */
     struct misa_ome_plane : public misaxx::misa_cached_data<misa_ome_plane_cache>,
                             public misaxx::misa_description_accessors_from_cache<misa_ome_plane_cache, misa_ome_plane> {

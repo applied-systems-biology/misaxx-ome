@@ -84,6 +84,11 @@ misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::of_opencv(
     return pixel_channel_type(opencv_depth_to_ome_pixel_type(m.depth()));
 }
 
+misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::of_opencv(const cv::Mat &t_mat) {
+    pixel_channels(t_mat.channels());
+    return pixel_channel_type(opencv_depth_to_ome_pixel_type(t_mat.depth()));
+}
+
 misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::depth(size_t size) {
     core_metadata().sizeZ = size;
     return *this;
@@ -119,3 +124,5 @@ misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::height(siz
 misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::of_size(size_t w, size_t h) {
     return width(w).height(h);
 }
+
+

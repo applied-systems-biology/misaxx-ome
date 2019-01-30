@@ -14,7 +14,6 @@ namespace misaxx::ome {
      * An OME TIFF file that contains a list of 2D image planes.
      * The planes can be accessed via their index within this structure or using a misa_ome_plane_location
      * that also encodes semantic location within a time/depth/channel space.
-     * @tparam Image cv::Mat or a coixx::image
      */
     struct misa_ome_tiff : public misaxx::misa_cached_data<misa_ome_tiff_cache>,
                            public misaxx::misa_description_accessors_from_cache<misa_ome_tiff_cache, misa_ome_tiff> {

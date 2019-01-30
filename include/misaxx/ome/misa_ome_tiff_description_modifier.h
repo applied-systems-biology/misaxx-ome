@@ -7,7 +7,6 @@
 #include <ome/xml/meta/OMEXMLMetadata.h>
 #include <misaxx/ome/descriptions/misa_ome_tiff_description.h>
 #include <misaxx/core/misa_description_storage.h>
-#include <misaxx/ome/utils/coixx_to_ome.h>
 #include <misaxx/ome/utils/ome_helpers.h>
 #include <opencv2/opencv.hpp>
 
@@ -79,17 +78,6 @@ namespace misaxx::ome {
          * @return
          */
         misa_ome_tiff_description_modifier &of_opencv(int opencv_type);
-
-        /**
-         * Sets the number of channels and the pixel type from an coi++ image type
-         * @param opencv_type
-         * @return
-         */
-        template<class Image>
-        misa_ome_tiff_description_modifier &of_coixx() {
-            pixel_channels(Image::color_type::channels);
-            return pixel_channel_type(coixx_to_ome_pixel_type<Image>());
-        }
 
         /**
          * Sets the number of planes in the Z (depth) axis

@@ -19,7 +19,6 @@ namespace misaxx::ome {
 
     /**
      * Cache that allows read and write access to an OME TIFF
-     * @tparam Image cv::Mat or a coixx::image
      */
     class misa_ome_tiff_cache : public misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description> {
