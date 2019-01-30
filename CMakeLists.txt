@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.11)
 project(misaxx-imaging-ome VERSION 0.1.0 DESCRIPTION "MISA++ OME Integration")
 
 find_package(misaxx-core REQUIRED)
-find_package(misaxx-static-opencv REQUIRED)
 find_package(misaxx-imaging REQUIRED)
 find_package(Boost 1.63 COMPONENTS REQUIRED system log_setup log iostreams)
 find_package(Threads REQUIRED)
@@ -52,7 +51,15 @@ add_library(misaxx-imaging-ome
         src/misaxx/ome/attachments/misa_ome_pixel_count.cpp
         include/misaxx/ome/attachments/misa_ome_pixel_count.h
         src/misaxx/ome/attachments/misa_ome_voxel.cpp
-        include/misaxx/ome/attachments/misa_ome_voxel.h include/misaxx/ome/utils/units_length.h include/misaxx/ome/utils/units_electric_potential.h include/misaxx/ome/utils/units_frequency.h include/misaxx/ome/utils/units_power.h include/misaxx/ome/utils/units_pressure.h include/misaxx/ome/utils/units_temperature.h include/misaxx/ome/utils/units_time.h include/misaxx/ome/attachments/misa_ome_quantity.h)
+        include/misaxx/ome/attachments/misa_ome_voxel.h
+        include/misaxx/ome/utils/units_length.h
+        include/misaxx/ome/utils/units_electric_potential.h
+        include/misaxx/ome/utils/units_frequency.h
+        include/misaxx/ome/utils/units_power.h
+        include/misaxx/ome/utils/units_pressure.h
+        include/misaxx/ome/utils/units_temperature.h
+        include/misaxx/ome/utils/units_time.h
+        include/misaxx/ome/attachments/misa_ome_quantity.h)
 
 set(MISAXX_LIBRARY misaxx-imaging-ome)
 set(MISAXX_LIBRARY_NAMESPACE misaxx::)
