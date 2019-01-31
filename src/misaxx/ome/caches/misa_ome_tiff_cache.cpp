@@ -6,13 +6,13 @@
 
 namespace {
     misaxx::misa_parameter<bool> get_remove_write_buffer_parameter() {
-        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome:remove-write-buffer" },
+        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "remove-write-buffer" },
                                               misaxx::misa_json_property<bool>().with_default_value(true).with_title("Remove OME TIFF write buffer")
                                                       .with_description("If true, the OME TIFF write buffer is removed during postprocessing") };
     }
 
     misaxx::misa_parameter<bool> get_disable_ome_tiff_writing_parameter() {
-        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome:disable-write-buffer-to-ome-tiff" },
+        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "disable-write-buffer-to-ome-tiff" },
                                               misaxx::misa_json_property<bool>().with_default_value(false).with_title("Disable OME TIFF writing")
                                                       .with_description("If true, the write buffer will not be postprocessed into a proper OME TIFF") };
     }
