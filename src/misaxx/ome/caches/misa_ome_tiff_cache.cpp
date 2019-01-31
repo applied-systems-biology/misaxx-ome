@@ -2,6 +2,21 @@
 #include <misaxx/ome/attachments/misa_ome_planes_location.h>
 #include <misaxx/core/runtime/misa_parameter_registry.h>
 #include <misaxx/ome/utils/ome_tiff_io.h>
+#include <misaxx/core/misa_parameter.h>
+
+namespace {
+    misaxx::misa_parameter<bool> get_remove_write_buffer_parameter() {
+        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome:remove-write-buffer" },
+                                              misaxx::misa_json_property<bool>().with_default_value(true).with_title("Remove OME TIFF write buffer")
+                                                      .with_description("If true, the OME TIFF write buffer is removed during postprocessing") };
+    }
+
+    misaxx::misa_parameter<bool> get_disable_ome_tiff_writing_parameter() {
+        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome:disable-write-buffer-to-ome-tiff" },
+                                              misaxx::misa_json_property<bool>().with_default_value(false).with_title("Disable OME TIFF writing")
+                                                      .with_description("If true, the write buffer will not be postprocessed into a proper OME TIFF") };
+    }
+}
 
 void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_description &t_description) {
 
@@ -73,10 +88,13 @@ misaxx::ome::misa_ome_tiff_cache::get_plane(const misaxx::ome::misa_ome_plane_de
 void misaxx::ome::misa_ome_tiff_cache::postprocess() {
     misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description>::postprocess();
-    bool remove_write_buffer = misaxx::parameter_registry::get_json({"runtime", "misaxx-ome:remove-write-buffer"},
-                                                                    misaxx::misa_json_property<bool>().with_default_value(true));
+    if(get_disable_ome_tiff_writing_parameter().query()) {
+        std::cout << "[WARNING] No OME TIFF is written, because it is disabled by a parameter!" << "\n";
+        return;
+    }
+
     // Close the TIFF
-    m_tiff->close(remove_write_buffer);
+    m_tiff->close(get_remove_write_buffer_parameter().query());
 }
 
 misaxx::ome::misa_ome_tiff_description
@@ -103,7 +121,8 @@ std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_tiff_cache::create_
 void misaxx::ome::misa_ome_tiff_cache::simulate_link() {
     misa_default_cache::simulate_link();
 
-    // Declare runtime parameter misaxx-ome:remove-write-buffer
-    misaxx::parameter_registry::register_parameter({ "runtime", "misaxx-ome:remove-write-buffer" },
-            misaxx::misa_json_property<bool>().with_default_value(true));
+    misaxx::parameter_registry::register_parameter(get_remove_write_buffer_parameter().location,
+            get_remove_write_buffer_parameter());
+    misaxx::parameter_registry::register_parameter(get_disable_ome_tiff_writing_parameter().location,
+            get_disable_ome_tiff_writing_parameter());;
 }
