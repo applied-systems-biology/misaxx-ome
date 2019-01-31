@@ -1,5 +1,4 @@
 #include <misaxx/ome/descriptions/misa_ome_tiff_description.h>
-#include <misaxx/core/runtime/misa_runtime_base.h>
 #include <misaxx/core/runtime/misa_runtime_properties.h>
 
 using namespace misaxx;

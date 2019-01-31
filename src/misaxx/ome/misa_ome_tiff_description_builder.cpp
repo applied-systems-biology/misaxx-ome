@@ -1,6 +1,5 @@
 #include <misaxx/ome/misa_ome_tiff_description_builder.h>
 #include <ome/files/PixelProperties.h>
-#include <misaxx/core/runtime/misa_runtime_base.h>
 #include "src/misaxx/ome/utils/ome_to_opencv.h"
 #include "src/misaxx/ome/utils/opencv_to_ome.h"
 #include <misaxx/core/runtime/misa_runtime_properties.h>
