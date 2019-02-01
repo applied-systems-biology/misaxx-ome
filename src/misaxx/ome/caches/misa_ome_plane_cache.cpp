@@ -42,7 +42,7 @@ void misaxx::ome::misa_ome_plane_cache::do_link(const misaxx::ome::misa_ome_plan
         throw std::runtime_error("Cannot link OME TIFF plane without a TIFF IO!");
     }
     this->set_unique_location(this->get_location() / "planes" /  (misaxx::utils::to_string(t_description) + ".tif"));
-    std::cout << "[Cache] Linking OME TIFF plane @ " << t_description << std::endl;
+    std::cout << "[Cache] Linking OME TIFF plane @ " << t_description << "\n";
 }
 
 void misaxx::ome::misa_ome_plane_cache::set_tiff_io(std::shared_ptr<misaxx::ome::ome_tiff_io> t_tiff) {

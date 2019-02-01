@@ -141,7 +141,13 @@ namespace misaxx::ome {
          */
         ::ome::files::dimension_size_type get_num_planes(::ome::files::dimension_size_type series) const;
 
+        bool compression_is_enabled() const;
+
+        void set_compression(bool enabled);
+
     private:
+
+        bool m_enable_compression = false;
 
         /**
          * Path of the TIFF that is read / written

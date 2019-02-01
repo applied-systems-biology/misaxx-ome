@@ -53,7 +53,7 @@ misaxx::ome::ome_tiff_io::get_reader(const misaxx::ome::misa_ome_plane_descripti
 }
 
 void misaxx::ome::ome_tiff_io::initialize_write_buffer_from_reader() const {
-    std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... " << std::endl;
+    std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... " << "\n";
     for(size_t series = 0; series < get_num_series(); ++series) {
         m_reader->setSeries(series);
         const auto size_Z = m_reader->getSizeZ();
@@ -65,7 +65,7 @@ void misaxx::ome::ome_tiff_io::initialize_write_buffer_from_reader() const {
                 for (size_t t = 0; t < size_T; ++t) {
                     const misa_ome_plane_description location(series, z, c, t);
                     const auto location_name = misaxx::utils::to_string(location);
-                    std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << std::endl;
+                    std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << "\n";
 
                     const boost::filesystem::path buffer_path = get_write_buffer_path(location);
                     if(!boost::filesystem::is_directory(buffer_path.parent_path())) {
@@ -86,16 +86,20 @@ misaxx::ome::ome_tiff_io::get_write_buffer_path(const misaxx::ome::misa_ome_plan
 }
 
 void misaxx::ome::ome_tiff_io::close_writer(bool remove_write_buffer) const {
-    std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << std::endl;
+    std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << "\n";
     // Save the write buffer files into the path
     auto writer = std::make_shared<::ome::files::out::OMETIFFWriter>();
     auto metadata = std::static_pointer_cast<::ome::xml::meta::MetadataRetrieve>(m_metadata);
     writer->setMetadataRetrieve(metadata);
     writer->setBigTIFF(true);
     writer->setId(m_path);
+    const auto compression_types = writer->getCompressionTypes();
+    if(compression_is_enabled() && compression_types.find("LZW") != compression_types.end()) {
+        writer->setCompression("LZW");
+    }
 
     for(const auto &kv : m_write_buffer) {
-        std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << kv.first << std::endl;
+        std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << kv.first << "\n";
         cv::Mat tmp = misaxx::imaging::utils::tiffread(kv.second);
         opencv_to_ome(tmp, *writer, kv.first);
 
@@ -191,7 +195,12 @@ void misaxx::ome::ome_tiff_io::write_plane(const cv::Mat &image, const misaxx::o
     if(!boost::filesystem::is_directory(buffer_path.parent_path())) {
         boost::filesystem::create_directories(buffer_path.parent_path());
     }
-    misaxx::imaging::utils::tiffwrite(image, buffer_path);
+    misaxx::imaging::utils::tiff_compression compression;
+    if(compression_is_enabled())
+        compression = misaxx::imaging::utils::tiff_compression::lzw;
+    else
+        compression = misaxx::imaging::utils::tiff_compression::none;
+    misaxx::imaging::utils::tiffwrite(image, buffer_path, compression);
     m_write_buffer[index] = buffer_path;
 }
 
@@ -234,5 +243,13 @@ misaxx::ome::ome_tiff_io::get_num_planes(::ome::files::dimension_size_type serie
 
 boost::filesystem::path misaxx::ome::ome_tiff_io::get_path() const {
     return m_path;
+}
+
+bool misaxx::ome::ome_tiff_io::compression_is_enabled() const {
+    return m_enable_compression;
+}
+
+void misaxx::ome::ome_tiff_io::set_compression(bool enabled) {
+    m_enable_compression = enabled;
 }
 

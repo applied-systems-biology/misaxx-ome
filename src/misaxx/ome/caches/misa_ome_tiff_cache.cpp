@@ -16,6 +16,12 @@ namespace {
                                               misaxx::misa_json_property<bool>().with_default_value(false).with_title("Disable OME TIFF writing")
                                                       .with_description("If true, the write buffer will not be postprocessed into a proper OME TIFF") };
     }
+
+    misaxx::misa_parameter<bool> get_enable_compression_parameter() {
+        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "enable-compression" },
+                                              misaxx::misa_json_property<bool>().with_default_value(false).with_title("Enable compression of output images")
+                                                      .with_description("If true, output data is compressed with LZW") };
+    }
 }
 
 void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_description &t_description) {
@@ -27,18 +33,21 @@ void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_
     this->set_unique_location(this->get_location() / t_description.filename);
 
     if(boost::filesystem::exists(this->get_unique_location())) {
-        std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << std::endl;
+        std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << "\n";
         m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location());
 
         // Put the loaded metadata into the description
         this->describe()->template get<misa_ome_tiff_description>().metadata = m_tiff->get_metadata();
     }
     else {
-        std::cout << "[Cache] Creating OME TIFF " << this->get_unique_location() << std::endl;
+        std::cout << "[Cache] Creating OME TIFF " << this->get_unique_location() << "\n";
 
         // Create the TIFF and generate the image caches
         m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location(), t_description.metadata);
     }
+
+    // Enable compression if needed
+    m_tiff->set_compression(get_enable_compression_parameter().query());
 
     // Create the plane caches
     for(size_t series = 0; series < m_tiff->get_num_series(); ++series) {
@@ -124,5 +133,7 @@ void misaxx::ome::misa_ome_tiff_cache::simulate_link() {
     misaxx::parameter_registry::register_parameter(get_remove_write_buffer_parameter().location,
             get_remove_write_buffer_parameter());
     misaxx::parameter_registry::register_parameter(get_disable_ome_tiff_writing_parameter().location,
-            get_disable_ome_tiff_writing_parameter());;
+            get_disable_ome_tiff_writing_parameter());
+    misaxx::parameter_registry::register_parameter(get_enable_compression_parameter().location,
+                                                   get_enable_compression_parameter());
 }
