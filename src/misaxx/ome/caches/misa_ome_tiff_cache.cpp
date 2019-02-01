@@ -19,7 +19,7 @@ namespace {
 
     misaxx::misa_parameter<bool> get_enable_compression_parameter() {
         return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "enable-compression" },
-                                              misaxx::misa_json_property<bool>().with_default_value(false).with_title("Enable compression of output images")
+                                              misaxx::misa_json_property<bool>().with_default_value(true).with_title("Enable compression of output images")
                                                       .with_description("If true, output data is compressed with LZW") };
     }
 }
