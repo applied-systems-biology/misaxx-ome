@@ -3,6 +3,7 @@
 //
 
 #include <misaxx/ome/accessors/misa_ome_tiff.h>
+#include "../utils/ome_tiff_io.h"
 
 misaxx::ome::misa_ome_tiff::iterator misaxx::ome::misa_ome_tiff::begin() {
     return this->data->get().begin();

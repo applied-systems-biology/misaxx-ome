@@ -22,7 +22,7 @@ add_library(misaxx-imaging-ome
         src/misaxx/ome/descriptions/misa_ome_tiff_description.cpp
         src/misaxx/ome/utils/opencv_to_ome.h
         src/misaxx/ome/utils/opencv_to_ome.cpp
-        include/misaxx/ome/utils/ome_tiff_io.h
+        src/misaxx/ome/utils/ome_tiff_io.h
         src/misaxx/ome/utils/ome_tiff_io.cpp
         include/misaxx/ome/utils/json_ome_pixel_type.h
         src/misaxx/ome/utils/json_ome_pixel_type.cpp

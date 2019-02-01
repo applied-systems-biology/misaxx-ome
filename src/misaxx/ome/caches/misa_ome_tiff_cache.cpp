@@ -1,7 +1,7 @@
 #include <misaxx/ome/caches/misa_ome_tiff_cache.h>
 #include <misaxx/ome/attachments/misa_ome_planes_location.h>
 #include <misaxx/core/runtime/misa_parameter_registry.h>
-#include <misaxx/ome/utils/ome_tiff_io.h>
+#include <src/misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/core/misa_parameter.h>
 
 namespace {

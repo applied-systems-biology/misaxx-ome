@@ -3,6 +3,7 @@
 //
 
 #include <misaxx/ome/accessors/misa_ome_plane.h>
+#include "../utils/ome_tiff_io.h"
 
 cv::Mat misaxx::ome::misa_ome_plane::clone() const {
     return this->access_readonly().get().clone();

@@ -10,10 +10,11 @@
 #include <opencv2/opencv.hpp>
 #include <ome/files/in/OMETIFFReader.h>
 #include <misaxx/core/misa_default_cache.h>
-#include <misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/ome/descriptions/misa_ome_plane_description.h>
 
 namespace misaxx::ome {
+
+    struct ome_tiff_io;
 
     /**
      * Caches a plane within an OME TIFF file.

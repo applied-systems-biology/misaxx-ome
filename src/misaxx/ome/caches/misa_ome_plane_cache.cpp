@@ -1,5 +1,6 @@
 #include <misaxx/ome/caches/misa_ome_plane_cache.h>
 #include <misaxx/ome/attachments/misa_ome_planes_location.h>
+#include "../utils/ome_tiff_io.h"
 
 cv::Mat &misaxx::ome::misa_ome_plane_cache::get() {
     return m_cached_image;

@@ -1,4 +1,4 @@
-#include <misaxx/ome/utils/ome_tiff_io.h>
+#include <src/misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/ome/descriptions/misa_ome_plane_description.h>
 #include <misaxx/core/utils/string.h>
 #include <misaxx/imaging/utils/tiffio.h>
