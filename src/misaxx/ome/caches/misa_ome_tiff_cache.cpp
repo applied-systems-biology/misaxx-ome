@@ -109,9 +109,8 @@ void misaxx::ome::misa_ome_tiff_cache::postprocess() {
 misaxx::ome::misa_ome_tiff_description
 misaxx::ome::misa_ome_tiff_cache::produce_description(const boost::filesystem::path &t_location,
                                                       const misaxx::ome::misa_ome_tiff_pattern &t_pattern) {
-    auto file_description = t_pattern.produce(t_location);
     misa_ome_tiff_description result;
-    result.filename = file_description.filename;
+    t_pattern.apply(result, t_location);
     return result;
 }
 
