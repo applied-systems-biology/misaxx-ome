@@ -80,28 +80,28 @@ namespace misaxx::ome {
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override {
             misaxx::misa_serializable::build_serialization_id_hierarchy(result);
             if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsLength>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/length"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/length"));
             }
             else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsElectricPotential>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/electric-potential"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/electric-potential"));
             }
             else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsFrequency>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/frequency"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/frequency"));
             }
             else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsPower>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/power"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/power"));
             }
             else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsPressure>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/pressure"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/pressure"));
             }
             else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsTemperature>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/temperature"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/temperature"));
             }
             else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsTime>::value) {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/units/time"));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/units/time"));
             }
             else {
-                result.emplace_back(misaxx::misa_serialization_id("misa_ome", std::string("attachments/units/") + typeid(ome_unit_type).name()));
+                result.emplace_back(misaxx::misa_serialization_id("misa-ome", std::string("attachments/units/") + typeid(ome_unit_type).name()));
             }
         }
 

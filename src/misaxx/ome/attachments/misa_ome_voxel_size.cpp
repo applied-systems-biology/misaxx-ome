@@ -72,7 +72,7 @@ bool misa_ome_voxel_size::operator==(const misa_ome_voxel_size &rhs) const {
 
 void misa_ome_voxel_size::build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const {
     misa_serializable::build_serialization_id_hierarchy(result);
-    result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/voxel-size"));
+    result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/voxel-size"));
 }
 
 misaxx::misa_quantity<double, misa_ome_unit_length<3>> misa_ome_voxel_size::get_volume() const {

@@ -26,7 +26,7 @@ void misa_ome_pixel_count::to_json_schema(const misaxx::misa_json_schema &t_sche
 
 void misa_ome_pixel_count::build_serialization_id_hierarchy(std::vector<misa_serialization_id> &result) const {
     misa_locatable::build_serialization_id_hierarchy(result);
-    result.emplace_back(misa_serialization_id("misa_ome", "attachments/pixel-count"));
+    result.emplace_back(misa_serialization_id("misa-ome", "attachments/pixel-count"));
 }
 
 misaxx::misa_quantity<double, misa_ome_unit_length<3>>

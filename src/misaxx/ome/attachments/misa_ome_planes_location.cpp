@@ -30,5 +30,5 @@ void misa_ome_planes_location::to_json_schema(const misaxx::misa_json_schema &t_
 
 void misa_ome_planes_location::build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const {
     misa_location::build_serialization_id_hierarchy(result);
-    result.emplace_back(misaxx::misa_serialization_id("misa_ome", "attachments/planes-location"));
+    result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/planes-location"));
 }
