@@ -4,42 +4,38 @@
 #include <src/misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/core/misa_parameter.h>
 
-namespace {
-    misaxx::misa_parameter<bool> get_remove_write_buffer_parameter() {
-        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "remove-write-buffer" },
-                                              misaxx::misa_json_property<bool>().with_default_value(true).with_title("Remove OME TIFF write buffer")
-                                                      .with_description("If true, the OME TIFF write buffer is removed during postprocessing") };
-    }
+misaxx::ome::misa_ome_tiff_cache::misa_ome_tiff_cache() {
+    m_remove_write_buffer_parameter = misaxx::misa_parameter<bool> { {"runtime", "misaxx-ome", "remove-write-buffer"} };
+    m_remove_write_buffer_parameter.schema->document_title("Remove OME TIFF write buffer")
+            .document_description("If true, the OME TIFF write buffer is removed during postprocessing")
+            .declare_optional(true);
 
-    misaxx::misa_parameter<bool> get_disable_ome_tiff_writing_parameter() {
-        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "disable-write-buffer-to-ome-tiff" },
-                                              misaxx::misa_json_property<bool>().with_default_value(false).with_title("Disable OME TIFF writing")
-                                                      .with_description("If true, the write buffer will not be postprocessed into a proper OME TIFF") };
-    }
+    m_disable_ome_tiff_writing_parameter = misaxx::misa_parameter<bool> { {"runtime", "misaxx-ome", "disable-write-buffer-to-ome-tiff"} };
+    m_disable_ome_tiff_writing_parameter.schema->document_title("Disable OME TIFF writing")
+            .document_description("If true, the write buffer will not be postprocessed into a proper OME TIFF")
+            .declare_optional(false);
 
-    misaxx::misa_parameter<bool> get_enable_compression_parameter() {
-        return misaxx::misa_parameter<bool> { { "runtime", "misaxx-ome", "enable-compression" },
-                                              misaxx::misa_json_property<bool>().with_default_value(true).with_title("Enable compression of output images")
-                                                      .with_description("If true, output data is compressed with LZW") };
-    }
+    m_enable_compression_parameter = misaxx::misa_parameter<bool> { {"runtime", "misaxx-ome", "enable-compression"} };
+    m_enable_compression_parameter.schema->document_title("Enable compression of output images")
+            .document_description("If true, output data is compressed with LZW")
+            .declare_optional(true);
 }
 
 void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_description &t_description) {
 
-    if(t_description.filename.empty())
+    if (t_description.filename.empty())
         throw std::runtime_error("Cannot link to file description with empty file name!");
 
     // We do cache initialization during linkage
     this->set_unique_location(this->get_location() / t_description.filename);
 
-    if(boost::filesystem::exists(this->get_unique_location())) {
+    if (boost::filesystem::exists(this->get_unique_location())) {
         std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << "\n";
         m_tiff = std::make_shared<ome_tiff_io>(this->get_unique_location());
 
         // Put the loaded metadata into the description
         this->describe()->template get<misa_ome_tiff_description>().metadata = m_tiff->get_metadata();
-    }
-    else {
+    } else {
         std::cout << "[Cache] Creating OME TIFF " << this->get_unique_location() << "\n";
 
         // Create the TIFF and generate the image caches
@@ -47,21 +43,22 @@ void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_
     }
 
     // Enable compression if needed
-    m_tiff->set_compression(get_enable_compression_parameter().query());
+    m_tiff->set_compression(m_enable_compression_parameter.query());
 
     // Create the plane caches
-    for(size_t series = 0; series < m_tiff->get_num_series(); ++series) {
+    for (size_t series = 0; series < m_tiff->get_num_series(); ++series) {
         const auto size_Z = m_tiff->get_size_z(series);
         const auto size_C = m_tiff->get_size_c(series);
         const auto size_T = m_tiff->get_size_t(series);
 
-        for(size_t z = 0; z < size_Z; ++z) {
-            for(size_t c = 0; c < size_C; ++c) {
-                for(size_t t = 0; t < size_T; ++t) {
+        for (size_t z = 0; z < size_Z; ++z) {
+            for (size_t c = 0; c < size_C; ++c) {
+                for (size_t t = 0; t < size_T; ++t) {
                     misa_ome_plane cache;
                     cache.data = std::make_shared<misa_ome_plane_cache>();
                     cache.data->set_tiff_io(m_tiff);
-                    cache.force_link(this->get_location(), misaxx::misa_description_storage::with(misa_ome_plane_description(series, z, c, t)));
+                    cache.force_link(this->get_location(), misaxx::misa_description_storage::with(
+                            misa_ome_plane_description(series, z, c, t)));
                     this->get().emplace_back(std::move(cache));
                 }
             }
@@ -86,7 +83,7 @@ misaxx::ome::misa_ome_tiff_cache::get_plane(const misaxx::ome::misa_ome_plane_de
 
     // Calculate the plane index
     size_t start_index = 0;
-    for(size_t series = 0; series < t_location.series; ++series) {
+    for (size_t series = 0; series < t_location.series; ++series) {
         start_index += m_tiff->get_num_planes(series);
     }
 
@@ -97,13 +94,13 @@ misaxx::ome::misa_ome_tiff_cache::get_plane(const misaxx::ome::misa_ome_plane_de
 void misaxx::ome::misa_ome_tiff_cache::postprocess() {
     misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description>::postprocess();
-    if(get_disable_ome_tiff_writing_parameter().query()) {
+    if (m_disable_ome_tiff_writing_parameter.query()) {
         std::cout << "[WARNING] No OME TIFF is written, because it is disabled by a parameter!" << "\n";
         return;
     }
 
     // Close the TIFF
-    m_tiff->close(get_remove_write_buffer_parameter().query());
+    m_tiff->close(m_remove_write_buffer_parameter.query());
 }
 
 misaxx::ome::misa_ome_tiff_description
@@ -119,7 +116,7 @@ std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_tiff_cache::create_
     result->filesystem_location = get_location();
     result->filesystem_unique_location = get_unique_location();
 
-    for(const auto &plane : this->get()) {
+    for (const auto &plane : this->get()) {
         result->planes.push_back(plane.get_plane_location());
     }
 
@@ -128,11 +125,6 @@ std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_tiff_cache::create_
 
 void misaxx::ome::misa_ome_tiff_cache::simulate_link() {
     misa_default_cache::simulate_link();
-
-    misaxx::parameter_registry::register_parameter(get_remove_write_buffer_parameter().location,
-            get_remove_write_buffer_parameter());
-    misaxx::parameter_registry::register_parameter(get_disable_ome_tiff_writing_parameter().location,
-            get_disable_ome_tiff_writing_parameter());
-    misaxx::parameter_registry::register_parameter(get_enable_compression_parameter().location,
-                                                   get_enable_compression_parameter());
 }
+
+

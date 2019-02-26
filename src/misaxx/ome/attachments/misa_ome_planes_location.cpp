@@ -23,9 +23,9 @@ void misa_ome_planes_location::to_json(nlohmann::json &t_json) const {
     t_json["ome-planes"] = planes;
 }
 
-void misa_ome_planes_location::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
+void misa_ome_planes_location::to_json_schema(misaxx::misa_json_schema_property &t_schema) const {
     misa_location::to_json_schema(t_schema);
-    t_schema.resolve("ome-planes").declare_required<std::vector<misa_ome_plane_description>>();
+    t_schema.resolve("ome-planes")->declare_required<std::vector<misa_ome_plane_description>>();
 }
 
 void misa_ome_planes_location::build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const {

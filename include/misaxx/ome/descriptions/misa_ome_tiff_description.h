@@ -8,6 +8,7 @@
 #include <misaxx/core/descriptions/misa_file_description.h>
 #include <ome/xml/meta/OMEXMLMetadata.h>
 #include <ome/files/MetadataTools.h>
+#include <misaxx/core/misa_json_schema_property.h>
 
 namespace misaxx::ome {
 
@@ -27,7 +28,7 @@ namespace misaxx::ome {
 
         void to_json(nlohmann::json &t_json) const override;
 
-        void to_json_schema(const misaxx::misa_json_schema &t_schema) const override;
+        void to_json_schema(misaxx::misa_json_schema_property &t_schema) const override;
 
     protected:
 

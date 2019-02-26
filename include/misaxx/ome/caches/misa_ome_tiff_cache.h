@@ -12,6 +12,7 @@
 #include <misaxx/ome/descriptions/misa_ome_tiff_description.h>
 #include <misaxx/core/misa_cached_data.h>
 #include <misaxx/ome/accessors/misa_ome_plane.h>
+#include <misaxx/core/misa_parameter.h>
 
 namespace misaxx::ome {
 
@@ -23,6 +24,8 @@ namespace misaxx::ome {
     class misa_ome_tiff_cache : public misaxx::misa_default_cache<misaxx::utils::memory_cache<std::vector<misa_ome_plane>>,
             misa_ome_tiff_pattern, misa_ome_tiff_description> {
     public:
+
+        misa_ome_tiff_cache();
 
         void simulate_link() override;
 
@@ -56,6 +59,10 @@ namespace misaxx::ome {
     private:
 
         std::shared_ptr<ome_tiff_io> m_tiff;
+
+        misaxx::misa_parameter<bool> m_remove_write_buffer_parameter;
+        misaxx::misa_parameter<bool> m_disable_ome_tiff_writing_parameter;
+        misaxx::misa_parameter<bool> m_enable_compression_parameter;
 
     };
 }

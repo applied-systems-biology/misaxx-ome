@@ -52,12 +52,12 @@ void misa_ome_plane_description::to_json(nlohmann::json &t_json) const {
     t_json["t"] = t;
 }
 
-void misa_ome_plane_description::to_json_schema(const misaxx::misa_json_schema &t_schema) const {
+void misa_ome_plane_description::to_json_schema(misaxx::misa_json_schema_property &t_schema) const {
     misa_data_description::to_json_schema(t_schema);
-    t_schema.resolve("series").declare_required<::ome::files::dimension_size_type>();
-    t_schema.resolve("z").declare_required<::ome::files::dimension_size_type>();
-    t_schema.resolve("c").declare_required<::ome::files::dimension_size_type>();
-    t_schema.resolve("t").declare_required<::ome::files::dimension_size_type>();
+    t_schema.resolve("series")->declare_required<::ome::files::dimension_size_type>();
+    t_schema.resolve("z")->declare_required<::ome::files::dimension_size_type>();
+    t_schema.resolve("c")->declare_required<::ome::files::dimension_size_type>();
+    t_schema.resolve("t")->declare_required<::ome::files::dimension_size_type>();
 }
 
 bool misa_ome_plane_description::operator==(const misa_ome_plane_description &rhs) const {
