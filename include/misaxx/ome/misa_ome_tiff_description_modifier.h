@@ -32,7 +32,7 @@ namespace misaxx::ome {
          * Returns the final TIFF description as storage
          * @return
          */
-        operator std::shared_ptr<misaxx::misa_description_storage>();
+        explicit operator std::shared_ptr<misaxx::misa_description_storage>();
 
         /**
        * All consecutive edit operations run on the provided series.
