@@ -26,3 +26,11 @@ misa_ome_tiff_description::build_serialization_id_hierarchy(std::vector<misaxx::
     misa_file_description::build_serialization_id_hierarchy(result);
     result.emplace_back(misaxx::misa_serialization_id("misa_ome", "descriptions/ome-tiff"));
 }
+
+std::string misa_ome_tiff_description::get_documentation_name() const {
+    return "OME TIFF";
+}
+
+std::string misa_ome_tiff_description::get_documentation_description() const {
+    return "A *.tiff/*.tif file that ist compatile with the OME TIFF standard";
+}
