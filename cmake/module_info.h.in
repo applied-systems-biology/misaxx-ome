@@ -15,7 +15,7 @@ namespace misaxx::ome {
         info.set_organization("Leibniz Institute for Natural Product Research and Infection Biology - Hans Knöll Institute (HKI), Jena, Germany");
         info.set_url("https://asb-git.hki-jena.de/RGerst/misaxx-imaging-ome/");
 
-        // External dependency: Boost
+        // External dependency: OME Files
         misaxx::misa_mutable_module_info ome_files_info;
         ome_files_info.set_id("ome-files");
         ome_files_info.set_name("OME-Files");
