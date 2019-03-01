@@ -24,7 +24,12 @@ namespace misaxx::ome {
         ome_files_info.set_citation("Goldberg, I. G., Allan, C., Burel, J.-M., Creager, D., Falconi, A., Hochheiser, H., Johnston, J., Mellen, J., Sorger, P. K., and Swedlow, J. R. (2005). The open microscopy environment (ome) data model and xml file: open tools for informatics and quantitative analysis in biological imaging. Genome biology, 6(5), R47.");
         ome_files_info.set_license("GPL");
         ome_files_info.set_is_external(true);
+
+        info.add_dependency(misaxx::module_info());
+        info.add_dependency(misaxx::imaging::module_info());
         info.add_dependency(std::move(ome_files_info));
+
+
         return info;
     }
 }
