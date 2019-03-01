@@ -10,7 +10,6 @@ namespace misaxx::ome {
         info.set_version("@PROJECT_VERSION@");
         info.set_name("@PROJECT_DESCRIPTION@");
         info.set_description("Support for OME TIFF");
-        info.add_dependency(misaxx::module_info());
         info.add_author("Ruman Gerst");
         info.set_license("BSD-2-Clause");
         info.set_organization("Leibniz Institute for Natural Product Research and Infection Biology - Hans Knöll Institute (HKI), Jena, Germany");
