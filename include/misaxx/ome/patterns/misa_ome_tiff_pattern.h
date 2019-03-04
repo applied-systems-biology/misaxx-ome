@@ -10,6 +10,10 @@
 namespace misaxx::ome {
     struct misa_ome_tiff_pattern : public misaxx::misa_file_pattern {
         misa_ome_tiff_pattern();
+
+        std::string get_documentation_name() const override;
+
+        std::string get_documentation_description() const override;
     };
 
     inline void to_json(nlohmann::json& j, const misa_ome_tiff_pattern& p) {

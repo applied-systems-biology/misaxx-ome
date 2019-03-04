@@ -65,7 +65,7 @@ set(MISAXX_LIBRARY misaxx-imaging-ome)
 set(MISAXX_LIBRARY_NAMESPACE misaxx::)
 set(MISAXX_API_NAME misaxx_ome)
 set(MISAXX_API_INCLUDE_PATH misaxx/ome)
-set(MISAXX_API_NAMESPACE misaxx::ome::)
+set(MISAXX_API_NAMESPACE misaxx::ome)
 misaxx_with_default_module_info()
 misaxx_with_default_api()
 

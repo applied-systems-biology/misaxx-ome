@@ -71,3 +71,11 @@ bool misa_ome_plane_description::operator<(const misa_ome_plane_description &rhs
     return series < rhs.series || z < rhs.z || c < rhs.c || t < rhs.t;
 }
 
+std::string misa_ome_plane_description::get_documentation_name() const {
+    return "OME TIFF Plane";
+}
+
+std::string misa_ome_plane_description::get_documentation_description() const {
+    return "A plane within an OME TIFF";
+}
+
