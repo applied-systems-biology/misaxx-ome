@@ -106,5 +106,13 @@ misaxx::misa_quantity<double, misa_ome_unit_length<1>> misa_ome_voxel_size::get_
         throw std::runtime_error("Voxel width and height are assumed to be the same!");
 }
 
+std::string misa_ome_voxel_size::get_documentation_name() const {
+    return "OME voxel size";
+}
+
+std::string misa_ome_voxel_size::get_documentation_description() const {
+    return "Voxel size of OME length units";
+}
+
 
 

@@ -151,5 +151,13 @@ bool misa_ome_voxel::is_valid() const {
     return get_from_x() < get_to_x() && get_from_y() < get_to_y() && get_from_z() < get_to_z();
 }
 
+std::string misa_ome_voxel::get_documentation_name() const {
+    return "OME Voxel";
+}
+
+std::string misa_ome_voxel::get_documentation_description() const {
+    return "Voxel of OME length types";
+}
+
 
 

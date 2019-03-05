@@ -33,3 +33,11 @@ misaxx::misa_quantity<double, misa_ome_unit_length<3>>
 misa_ome_pixel_count::get_volume(const misa_ome_voxel_size &voxel_size) const {
     return voxel_size.get_volume() * static_cast<double>(count);
 }
+
+std::string misa_ome_pixel_count::get_documentation_name() const {
+    return "Pixel Count";
+}
+
+std::string misa_ome_pixel_count::get_documentation_description() const {
+    return "Number of pixels";
+}

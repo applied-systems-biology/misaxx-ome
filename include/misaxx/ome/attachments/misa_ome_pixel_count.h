@@ -29,6 +29,10 @@ namespace misaxx::ome {
 
         misaxx::misa_quantity<double, misa_ome_unit_length<3>> get_volume(const misa_ome_voxel_size &voxel_size) const;
 
+        std::string get_documentation_name() const override;
+
+        std::string get_documentation_description() const override;
+
     protected:
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override;
     };

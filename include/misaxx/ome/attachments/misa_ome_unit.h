@@ -75,6 +75,37 @@ namespace misaxx::ome {
             t_schema.resolve("order")->declare_required<size_t>();
         }
 
+        std::string get_documentation_name() const override {
+            if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsLength>::value) {
+                return "Length unit";
+            }
+            else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsElectricPotential>::value) {
+                return "Electric potential unit";
+            }
+            else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsFrequency>::value) {
+                return "Frequency unit";
+            }
+            else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsPower>::value) {
+                return "Power unit";
+            }
+            else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsPressure>::value) {
+                return "Pressure unit";
+            }
+            else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsTemperature>::value) {
+                return "Temperature unit";
+            }
+            else if constexpr (std::is_same<ome_unit_type, ::ome::xml::model::enums::UnitsTime>::value) {
+                return "Time unit";
+            }
+            else {
+                return "OME Unit";
+            }
+        }
+
+        std::string get_documentation_description() const override {
+            return "An OME unit";
+        }
+
     protected:
         void build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const override {
             misaxx::misa_serializable::build_serialization_id_hierarchy(result);

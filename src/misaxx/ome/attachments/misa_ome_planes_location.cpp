@@ -32,3 +32,11 @@ void misa_ome_planes_location::build_serialization_id_hierarchy(std::vector<misa
     misa_location::build_serialization_id_hierarchy(result);
     result.emplace_back(misaxx::misa_serialization_id("misa-ome", "attachments/planes-location"));
 }
+
+std::string misa_ome_planes_location::get_documentation_name() const {
+    return "OME TIFF planes location";
+}
+
+std::string misa_ome_planes_location::get_documentation_description() const {
+    return "Location within an OME TIFF";
+}
