@@ -24,7 +24,7 @@ void misa_ome_tiff_description::to_json_schema(misaxx::misa_json_schema_property
 void
 misa_ome_tiff_description::build_serialization_id_hierarchy(std::vector<misaxx::misa_serialization_id> &result) const {
     misa_file_description::build_serialization_id_hierarchy(result);
-    result.emplace_back(misaxx::misa_serialization_id("misa_ome", "descriptions/ome-tiff"));
+    result.emplace_back(misaxx::misa_serialization_id("misa-ome", "descriptions/ome-tiff"));
 }
 
 std::string misa_ome_tiff_description::get_documentation_name() const {
