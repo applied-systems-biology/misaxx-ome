@@ -162,6 +162,14 @@ std::string misa_ome_voxel::get_documentation_description() const {
     return "Voxel of OME length types";
 }
 
+misa_ome_voxel misa_ome_voxel::cast_unit(const misa_ome_voxel::unit_type &t_unit) const {
+    misa_ome_voxel result;
+    result.x_range = x_range.cast_unit(t_unit);
+    result.y_range = y_range.cast_unit(t_unit);
+    result.z_range = z_range.cast_unit(t_unit);
+    return result;
+}
+
 
 
 

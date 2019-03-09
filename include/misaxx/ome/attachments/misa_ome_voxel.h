@@ -49,6 +49,12 @@ namespace misaxx::ome {
         explicit operator misa_ome_voxel_size() const;
 
         /**
+         * Converts the unit of the ranges
+         * @param t_unit
+         */
+        misa_ome_voxel cast_unit(const unit_type &t_unit) const;
+
+        /**
          * Returns the voxel size
          * @return
          */
