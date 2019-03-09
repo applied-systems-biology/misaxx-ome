@@ -52,17 +52,17 @@ misa_ome_voxel_size::misa_ome_voxel_size(const ::ome::xml::meta::OMEXMLMetadata 
 }
 
 void misa_ome_voxel_size::from_json(const nlohmann::json &t_json) {
-    values.from_json(t_json["values"]);
+    values.values_from_json(t_json, { "x", "y", "z" });
 }
 
 void misa_ome_voxel_size::to_json(nlohmann::json &t_json) const {
     misa_serializable::to_json(t_json);
-    values.to_json(t_json["values"]);
+    values.values_to_json(t_json, { "x", "y", "z" });
 }
 
 void misa_ome_voxel_size::to_json_schema(misaxx::misa_json_schema_property &t_schema) const {
     misa_serializable::to_json_schema(t_schema);
-    values.to_json_schema(t_schema["values"]);
+    values.values_to_json_schema(t_schema, { "x", "y", "z" });
 }
 
 

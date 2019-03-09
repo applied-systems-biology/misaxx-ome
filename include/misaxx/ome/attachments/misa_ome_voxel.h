@@ -7,6 +7,7 @@
 #include <misaxx/core/attachments/misa_matrix.h>
 #include <misaxx/ome/attachments/misa_ome_unit.h>
 #include <misaxx/ome/attachments/misa_ome_voxel_size.h>
+#include <misaxx/core/attachments/misa_quantity_range.h>
 
 namespace misaxx::ome {
 
@@ -15,17 +16,13 @@ namespace misaxx::ome {
      * The 'from' point is inclusive, while the 'to' point is exclusive
      */
     struct misa_ome_voxel : public misaxx::misa_serializable {
-        using matrix_type = misaxx::misa_matrix<double, misaxx::ome::misa_ome_unit_length <1>, 3, 2>;
+        using range_type = misaxx::misa_quantity_range<double, misaxx::ome::misa_ome_unit_length <1>>;
         using unit_type = misaxx::ome::misa_ome_unit_length<1>;
         using ome_unit_type = typename unit_type::ome_unit_type;
 
-        /**
-         * Matrix that stores the range values.
-         * row[0, 1, 2] = x, y, z
-         * column[0] = from
-         * column[1] = to
-         */
-        matrix_type ranges;
+        range_type x_range;
+        range_type y_range;
+        range_type z_range;
 
         /**
          * Initializes an invalid voxel (MAX, MIN) ranges
@@ -37,13 +34,13 @@ namespace misaxx::ome {
          * and a unit
          * @param t_unit
          */
-        explicit misa_ome_voxel(unit_type t_unit);
+        explicit misa_ome_voxel(const unit_type &t_unit);
 
         /**
          * Initializes a voxel from an input matrix
          * @param t_matrix
          */
-        explicit misa_ome_voxel(matrix_type t_matrix);
+        explicit misa_ome_voxel(range_type t_x, range_type t_y, range_type t_z);
 
         /**
          * Returns the voxel size

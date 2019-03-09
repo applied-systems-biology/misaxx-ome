@@ -8,20 +8,27 @@
 using namespace misaxx;
 using namespace misaxx::ome;
 
-misa_ome_voxel::misa_ome_voxel() : ranges(matrix_type{ { INFINITY, -INFINITY,
-                                                         INFINITY, -INFINITY,
-                                                         INFINITY, -INFINITY} }) {
+misa_ome_voxel::misa_ome_voxel() : x_range(range_type(INFINITY, -INFINITY)),
+                                   y_range(range_type(INFINITY, -INFINITY)),
+                                   z_range(range_type(INFINITY, -INFINITY)) {
 
 }
 
-misa_ome_voxel::misa_ome_voxel(misa_ome_voxel::unit_type t_unit) :
-                                    ranges(matrix_type{ { INFINITY, -INFINITY,
-                                                          INFINITY, -INFINITY,
-                                                          INFINITY, -INFINITY}, std::move(t_unit) }) {
+misa_ome_voxel::misa_ome_voxel(const misa_ome_voxel::unit_type &t_unit) : x_range(
+        range_type(INFINITY, -INFINITY, t_unit)),
+                                                                          y_range(range_type(INFINITY, -INFINITY,
+                                                                                             t_unit)),
+                                                                          z_range(range_type(INFINITY, -INFINITY,
+                                                                                             t_unit)) {
 
 }
 
-misa_ome_voxel::misa_ome_voxel(misa_ome_voxel::matrix_type t_matrix) : ranges(std::move(t_matrix)) {
+misa_ome_voxel::misa_ome_voxel(misa_ome_voxel::range_type t_x,
+                               misa_ome_voxel::range_type t_y,
+                               misa_ome_voxel::range_type t_z) :
+        x_range(std::move(t_x)),
+        y_range(std::move(t_y)),
+        z_range(std::move(t_z)) {
 
 }
 
@@ -30,94 +37,84 @@ misa_ome_voxel::operator misa_ome_voxel_size() const {
 }
 
 misa_ome_voxel_size misa_ome_voxel::get_size() const {
-    return misa_ome_voxel_size(get_size_x().get_value(), get_size_y().get_value(), get_size_z().get_value(), ranges.get_unit());
+    auto same_unit = misaxx::misa_quantities_to_same_unit<double, misa_ome_voxel::unit_type >(
+            {x_range.get_length(), y_range.get_length(), z_range.get_length()});
+    return misa_ome_voxel_size(same_unit[0].get_value(),
+                               same_unit[1].get_value(),
+                               same_unit[2].get_value(),
+                               same_unit[0].get_unit());
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_size_x() const {
-    return get_to_x() - get_from_x();
+    return x_range.get_length();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_size_y() const {
-    return get_to_y() - get_from_y();
+    return y_range.get_length();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_size_z() const {
-    return get_to_z() - get_from_z();
+    return z_range.get_length();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_from_x() const {
-    return ranges.get(0, 0);
+    return x_range.get_from();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_to_x() const {
-    return ranges.get(0, 1);
+    return x_range.get_to();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_from_y() const {
-    return ranges.get(1, 0);
+    return y_range.get_from();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_to_y() const {
-    return ranges.get(1, 1);
+    return y_range.get_to();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_from_z() const {
-    return ranges.get(2, 0);
+    return z_range.get_from();
 }
 
 misa_quantity<double, misa_ome_voxel::unit_type> misa_ome_voxel::get_to_z() const {
-    return ranges.get(2, 1);
+    return z_range.get_to();
 }
 
 void misa_ome_voxel::set_from_x(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    ranges.set(0, 0, value);
+    x_range.set_from(value);
 }
 
 void misa_ome_voxel::set_to_x(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    ranges.set(0, 1, value);
+    x_range.set_to(value);
 }
 
 void misa_ome_voxel::set_from_y(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    ranges.set(1, 0, value);
+    y_range.set_from(value);
 }
 
 void misa_ome_voxel::set_to_y(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    ranges.set(1, 1, value);
+    y_range.set_to(value);
 }
 
 void misa_ome_voxel::set_from_z(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    ranges.set(2, 0, value);
+    z_range.set_from(value);
 }
 
 void misa_ome_voxel::set_to_z(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    ranges.set(2, 1, value);
+    z_range.set_to(value);
 }
 
 void misa_ome_voxel::include_x(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    if(value < get_from_x()) {
-        set_from_x(value);
-    }
-    if(value >= get_to_x()) {
-        set_to_x(value);
-    }
+    x_range.include(value);
 }
 
 void misa_ome_voxel::include_y(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    if(value < get_from_y()) {
-        set_from_y(value);
-    }
-    if(value >= get_to_y()) {
-        set_to_y(value);
-    }
+    y_range.include(value);
 }
 
 void misa_ome_voxel::include_z(const misa_quantity<double, misa_ome_voxel::unit_type> &value) {
-    if(value < get_from_z()) {
-        set_from_z(value);
-    }
-    if(value >= get_to_z()) {
-        set_to_z(value);
-    }
+    z_range.include(value);
 }
 
 void misa_ome_voxel::include(const misa_quantity<double, misa_ome_voxel::unit_type> &x,
@@ -129,17 +126,23 @@ void misa_ome_voxel::include(const misa_quantity<double, misa_ome_voxel::unit_ty
 }
 
 void misa_ome_voxel::from_json(const nlohmann::json &t_json) {
-    ranges.from_json(t_json["ranges"]);
+    x_range.from_json(t_json["x"]);
+    y_range.from_json(t_json["y"]);
+    z_range.from_json(t_json["z"]);
 }
 
 void misa_ome_voxel::to_json(nlohmann::json &t_json) const {
     misa_serializable::to_json(t_json);
-    ranges.to_json(t_json["ranges"]);
+    x_range.to_json(t_json["x"]);
+    y_range.to_json(t_json["y"]);
+    z_range.to_json(t_json["z"]);
 }
 
 void misa_ome_voxel::to_json_schema(misa_json_schema_property &t_schema) const {
     misa_serializable::to_json_schema(t_schema);
-    ranges.to_json_schema(t_schema["ranges"]);
+    x_range.to_json_schema(*t_schema.resolve("x"));
+    y_range.to_json_schema(*t_schema.resolve("y"));
+    z_range.to_json_schema(*t_schema.resolve("z"));
 }
 
 void misa_ome_voxel::build_serialization_id_hierarchy(std::vector<misa_serialization_id> &result) const {
@@ -158,6 +161,8 @@ std::string misa_ome_voxel::get_documentation_name() const {
 std::string misa_ome_voxel::get_documentation_description() const {
     return "Voxel of OME length types";
 }
+
+
 
 
 
