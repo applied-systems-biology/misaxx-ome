@@ -67,11 +67,12 @@ namespace misaxx::ome {
         void to_json_schema(misaxx::misa_json_schema_property &t_schema) const override {
             misaxx::misa_unit<Order>::to_json_schema(t_schema);
             auto unit_property = t_schema.resolve("unit");
+            unit_property->declare_required<std::string>();
             std::vector<std::string> units;
             for(const auto &kv : ome_unit_type::values()) {
                 units.push_back(kv.second);
             }
-            unit_property->make_enum(units);;
+            unit_property->make_enum(units);
             t_schema.resolve("order")->declare_required<size_t>();
         }
 
