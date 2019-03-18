@@ -18,7 +18,9 @@ void misa_ome_tiff_description::to_json(nlohmann::json &t_json) const {
 
 void misa_ome_tiff_description::to_json_schema(misaxx::misa_json_schema_property &t_schema) const {
     misa_file_description::to_json_schema(t_schema);
-    t_schema.resolve("ome-xml-metadata")->declare_optional<std::string>();
+    t_schema.resolve("ome-xml-metadata")->declare_optional<std::string>()
+            .document_title("OME XML Metadata")
+            .document_description("OME XML metadata that describes this TIFF");
 }
 
 void
