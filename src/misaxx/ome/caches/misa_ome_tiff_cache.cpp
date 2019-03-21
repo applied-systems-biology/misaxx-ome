@@ -57,7 +57,8 @@ void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_
                     misa_ome_plane cache;
                     cache.data = std::make_shared<misa_ome_plane_cache>();
                     cache.data->set_tiff_io(m_tiff);
-                    cache.force_link(this->get_location(), misaxx::misa_description_storage::with(
+                    cache.force_link(this->get_internal_location(),
+                            this->get_location(), misaxx::misa_description_storage::with(
                             misa_ome_plane_description(series, z, c, t)));
                     this->get().emplace_back(std::move(cache));
                 }
