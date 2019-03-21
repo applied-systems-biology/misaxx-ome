@@ -114,6 +114,7 @@ misaxx::ome::misa_ome_tiff_cache::produce_description(const boost::filesystem::p
 
 std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_tiff_cache::create_location_interface() const {
     auto result = std::make_shared<misaxx::ome::misa_ome_planes_location>();
+    result->internal_location = get_internal_location();
     result->filesystem_location = get_location();
     result->filesystem_unique_location = get_unique_location();
 
