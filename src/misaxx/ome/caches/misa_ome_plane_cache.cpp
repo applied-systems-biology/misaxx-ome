@@ -59,6 +59,7 @@ const misaxx::ome::misa_ome_plane_description &misaxx::ome::misa_ome_plane_cache
 
 std::shared_ptr<misaxx::misa_location> misaxx::ome::misa_ome_plane_cache::create_location_interface() const {
     auto result = std::make_shared<misaxx::ome::misa_ome_planes_location>();
+    result->internal_location = get_internal_location();
     result->filesystem_location = get_location();
     result->filesystem_unique_location = get_unique_location();
     result->planes = { get_plane_location() };
