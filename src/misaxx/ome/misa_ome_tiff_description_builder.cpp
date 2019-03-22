@@ -124,4 +124,9 @@ misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::of_size(si
     return width(w).height(h);
 }
 
+misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::with_filename(std::string filename) {
+    m_result.filename = filename;
+    return *this;
+}
+
 
