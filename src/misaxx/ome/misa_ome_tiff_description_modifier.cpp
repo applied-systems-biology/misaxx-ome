@@ -167,3 +167,8 @@ misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::of_size(
 
     return width(w).height(h);
 }
+
+misa_ome_tiff_description_modifier &misa_ome_tiff_description_modifier::with_filename(std::string filename) {
+    m_result.filename = std::move(filename);
+    return *this;
+}

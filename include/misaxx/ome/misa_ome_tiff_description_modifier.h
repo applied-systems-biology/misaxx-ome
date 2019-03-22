@@ -124,6 +124,13 @@ namespace misaxx::ome {
         misa_ome_tiff_description_modifier &of_size(size_t w, size_t h);
 
         /**
+         * Sets the filename
+         * @param filename
+         * @return
+         */
+        misa_ome_tiff_description_modifier &with_filename(std::string filename);
+
+        /**
          * Modifies the description with a custom function
          * @tparam Function
          * @param t_function Function that takes a ::ome::xml::meta::OMEXMLMetadata

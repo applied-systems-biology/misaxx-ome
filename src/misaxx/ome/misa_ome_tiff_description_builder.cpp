@@ -125,7 +125,7 @@ misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::of_size(si
 }
 
 misa_ome_tiff_description_builder &misa_ome_tiff_description_builder::with_filename(std::string filename) {
-    m_result.filename = filename;
+    m_result.filename = std::move(filename);
     return *this;
 }
 
