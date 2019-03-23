@@ -7,7 +7,6 @@
 
 #include <misaxx/core/misa_cache.h>
 #include <misaxx/core/misa_default_cache.h>
-#include <ome/files/in/OMETIFFReader.h>
 #include <misaxx/ome/patterns/misa_ome_tiff_pattern.h>
 #include <misaxx/ome/descriptions/misa_ome_tiff_description.h>
 #include <misaxx/core/misa_cached_data.h>

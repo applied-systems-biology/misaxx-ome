@@ -8,36 +8,19 @@
 #include <memory>
 #include <shared_mutex>
 #include <unordered_set>
-#include <ome/files/out/OMETIFFWriter.h>
-#include <ome/files/in/OMETIFFReader.h>
-#include <ome/xml/meta/Convert.h>
 #include <opencv2/opencv.hpp>
 #include <boost/filesystem.hpp>
 #include <misaxx/core/misa_cache.h>
 #include <boost/regex.hpp>
-#include <misaxx/ome/utils/ome_helpers.h>
-#include <ome/files/MetadataTools.h>
+#include <ome/xml/meta/OMEXMLMetadata.h>
+#include <ome/files/Types.h>
 
 namespace misaxx::ome {
 
     // Forward declare
     struct misa_ome_plane_description;
 
-    /**
-     * Exposes the internal OME XML, as the metadata maps do not contain all information for some reason
-     */
-    struct custom_ome_tiff_reader : public ::ome::files::in::OMETIFFReader {
-
-        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_xml_metadata() const {
-            auto meta = cacheMetadata(*currentId); // Try the cached metadata of the current file
-            boost::filesystem::path first_tiff_path = meta->getUUIDFileName(0, 0);
-            first_tiff_path = boost::filesystem::canonical(first_tiff_path, currentId.value().parent_path());
-            if(currentId != first_tiff_path) {
-                meta = ::ome::files::createOMEXMLMetadata(first_tiff_path);
-            }
-            return meta;
-        }
-    };
+    struct ome_tiff_io_impl;
 
     /**
      * Allows thread-safe read and write access to an OME TIFF
@@ -49,10 +32,7 @@ namespace misaxx::ome {
     class ome_tiff_io {
     public:
 
-        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
-        using locked_writer_type = misaxx::utils::locked<std::shared_ptr<::ome::files::out::OMETIFFWriter>, std::unique_lock<std::shared_mutex>>;
-
-        ome_tiff_io() = default;
+        ome_tiff_io();
 
         /**
          * Opens an existing OME TIFF file
@@ -75,6 +55,8 @@ namespace misaxx::ome {
          * @param t_reference
          */
         explicit ome_tiff_io(boost::filesystem::path t_path, const ome_tiff_io &t_reference);
+
+        ~ome_tiff_io();
 
         void write_plane(const cv::Mat &image, const misa_ome_plane_description &index);
 
@@ -147,51 +129,7 @@ namespace misaxx::ome {
 
     private:
 
-        bool m_enable_compression = false;
+        ome_tiff_io_impl *m_pimpl;
 
-        /**
-         * Path of the TIFF that is read / written
-         */
-        mutable boost::filesystem::path m_path;
-
-        /**
-         * Because of limitations to OMETIFFWriter, we buffer any output TIFF in a separate directory
-         */
-        mutable std::map<misa_ome_plane_description, boost::filesystem::path> m_write_buffer;
-
-        mutable std::shared_ptr<custom_ome_tiff_reader> m_reader;
-        mutable std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m_metadata;
-        mutable std::shared_mutex m_mutex;
-
-        /**
-         * Returns the filename of the path without .ome.tif extension
-         * @return
-         */
-        boost::filesystem::path get_base_filename() const;
-
-        void open_reader() const;
-
-        void close_reader() const;
-
-        void close_writer(bool remove_write_buffer) const;
-
-        /**
-         * Returns the write buffer path for a location
-         * @param t_location
-         * @return
-         */
-        boost::filesystem::path get_write_buffer_path(const misa_ome_plane_description &t_location) const;
-
-       /**
-        * Copies all TIFF images stored inside the current reader into the buffer directory
-        */
-        void initialize_write_buffer_from_reader() const;
-
-        /**
-        * Thread-safe access to the managed reader
-        * If applicable, returns a reader to a plane in the write buffer
-        * @return
-        */
-        locked_reader_type get_reader(const misa_ome_plane_description &t_location) const;
     };
 }

@@ -2,19 +2,195 @@
 #include <misaxx/ome/descriptions/misa_ome_plane_description.h>
 #include <misaxx/core/utils/string.h>
 #include <misaxx/imaging/utils/tiffio.h>
+#include <ome/files/out/OMETIFFWriter.h>
+#include <ome/files/in/OMETIFFReader.h>
+#include <ome/xml/meta/Convert.h>
+#include <misaxx/ome/utils/ome_helpers.h>
+#include <ome/files/MetadataTools.h>
 #include <opencv2/opencv.hpp>
 #include "ome_to_opencv.h"
 #include "opencv_to_ome.h"
 #include "ome_to_ome.h"
 
+namespace {
+    /**
+    * Exposes the internal OME XML, as the metadata maps do not contain all information for some reason
+    */
+    struct custom_ome_tiff_reader : public ::ome::files::in::OMETIFFReader {
 
-misaxx::ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path) : m_path(std::move(t_path)) {
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_xml_metadata() const {
+            auto meta = cacheMetadata(*currentId); // Try the cached metadata of the current file
+            boost::filesystem::path first_tiff_path = meta->getUUIDFileName(0, 0);
+            first_tiff_path = boost::filesystem::canonical(first_tiff_path, currentId.value().parent_path());
+            if(currentId != first_tiff_path) {
+                meta = ::ome::files::createOMEXMLMetadata(first_tiff_path);
+            }
+            return meta;
+        }
+    };
+}
+
+namespace misaxx::ome {
+    
+    struct ome_tiff_io_impl {        
+    public:
+
+        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
+        using locked_writer_type = misaxx::utils::locked<std::shared_ptr<::ome::files::out::OMETIFFWriter>, std::unique_lock<std::shared_mutex>>;
+
+        ome_tiff_io_impl() = default;
+
+        /**
+         * Opens an existing OME TIFF file
+         * @param t_path
+         */
+        explicit ome_tiff_io_impl(boost::filesystem::path t_path);
+
+        /**
+         *  Opens an existing OME TIFF file or creates a new one based on the metadata
+         *  If the file already exists, the metadata is loaded from the file instead.
+         * @param t_path
+         * @param t_metadata
+         */
+        explicit ome_tiff_io_impl(boost::filesystem::path t_path,
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> t_metadata);
+
+        /**
+         * Opens an existing OME TIFF file or creates a new one based on the reference
+         * @param t_path
+         * @param t_reference
+         */
+        explicit ome_tiff_io_impl(boost::filesystem::path t_path, const ome_tiff_io &t_reference);
+
+        void write_plane(const cv::Mat &image, const misa_ome_plane_description &index);
+
+        cv::Mat read_plane(const misa_ome_plane_description &index) const;
+
+        /**
+         * Thread-safe access to the metadata
+         * @return
+         */
+        std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> get_metadata() const;
+
+        boost::filesystem::path get_path() const;
+
+        /**
+         * Closes any open reader and writer. This method is thread-safe.
+         */
+        void close(bool remove_write_buffer = true);
+
+        /**
+         * The number of image series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_num_series() const;
+
+        /**
+         * The width of each plane
+         * @param series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_size_x(::ome::files::dimension_size_type series) const;
+
+        /**
+         * The height of each plane
+         * @param series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_size_y(::ome::files::dimension_size_type series) const;
+
+        /**
+         * Planes located in depth axis
+         * @param series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_size_z(::ome::files::dimension_size_type series) const;
+
+        /**
+         * Planes located in time axis
+         * @param series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_size_t(::ome::files::dimension_size_type series) const;
+
+        /**
+         * Planes located in channel axis (this is the same as OME's effectiveSizeC)
+         * @param series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_size_c(::ome::files::dimension_size_type series) const;
+
+        /**
+         * Number of planes (Z * C * T)
+         * @param series
+         * @return
+         */
+        ::ome::files::dimension_size_type get_num_planes(::ome::files::dimension_size_type series) const;
+
+        bool compression_is_enabled() const;
+
+        void set_compression(bool enabled);
+        
+    private:
+        bool m_enable_compression = false;
+
+        /**
+         * Path of the TIFF that is read / written
+         */
+        mutable boost::filesystem::path m_path;
+
+        /**
+         * Because of limitations to OMETIFFWriter, we buffer any output TIFF in a separate directory
+         */
+        mutable std::map<misa_ome_plane_description, boost::filesystem::path> m_write_buffer;
+
+        mutable std::shared_ptr<custom_ome_tiff_reader> m_reader;
+        mutable std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m_metadata;
+        mutable std::shared_mutex m_mutex;
+
+        /**
+         * Returns the filename of the path without .ome.tif extension
+         * @return
+         */
+        boost::filesystem::path get_base_filename() const;
+
+        void open_reader() const;
+
+        void close_reader() const;
+
+        void close_writer(bool remove_write_buffer) const;
+
+        /**
+         * Returns the write buffer path for a location
+         * @param t_location
+         * @return
+         */
+        boost::filesystem::path get_write_buffer_path(const misa_ome_plane_description &t_location) const;
+
+        /**
+         * Copies all TIFF images stored inside the current reader into the buffer directory
+         */
+        void initialize_write_buffer_from_reader() const;
+
+        /**
+        * Thread-safe access to the managed reader
+        * If applicable, returns a reader to a plane in the write buffer
+        * @return
+        */
+        locked_reader_type get_reader(const misa_ome_plane_description &t_location) const;
+    };
+}
+
+using namespace misaxx::ome;
+
+
+ome_tiff_io_impl::ome_tiff_io_impl(boost::filesystem::path t_path) : m_path(std::move(t_path)) {
     if (!boost::filesystem::exists(m_path)) {
         throw std::runtime_error("Cannot read from non-existing file " + m_path.string());
     }
 }
 
-misaxx::ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path,
+ome_tiff_io_impl::ome_tiff_io_impl(boost::filesystem::path t_path,
                                      std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> t_metadata) : m_path(
         std::move(t_path)), m_metadata(std::move(t_metadata)) {
     // We can load metadata from the file if it exists
@@ -23,12 +199,12 @@ misaxx::ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path,
     }
 }
 
-misaxx::ome::ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path, const misaxx::ome::ome_tiff_io &t_reference)
-        : ome_tiff_io(std::move(t_path), t_reference.get_metadata()) {
+ome_tiff_io_impl::ome_tiff_io_impl(boost::filesystem::path t_path, const ome_tiff_io &t_reference)
+        : ome_tiff_io_impl(std::move(t_path), t_reference.get_metadata()) {
 }
 
-misaxx::ome::ome_tiff_io::locked_reader_type
-misaxx::ome::ome_tiff_io::get_reader(const misaxx::ome::misa_ome_plane_description &t_location) const {
+ome_tiff_io_impl::locked_reader_type
+ome_tiff_io_impl::get_reader(const misa_ome_plane_description &t_location) const {
     std::shared_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
     lock.lock();
     if(static_cast<bool>(m_reader)) {
@@ -52,7 +228,7 @@ misaxx::ome::ome_tiff_io::get_reader(const misaxx::ome::misa_ome_plane_descripti
     }
 }
 
-void misaxx::ome::ome_tiff_io::initialize_write_buffer_from_reader() const {
+void ome_tiff_io_impl::initialize_write_buffer_from_reader() const {
     std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... " << "\n";
     for(size_t series = 0; series < get_num_series(); ++series) {
         m_reader->setSeries(series);
@@ -81,11 +257,11 @@ void misaxx::ome::ome_tiff_io::initialize_write_buffer_from_reader() const {
 }
 
 boost::filesystem::path
-misaxx::ome::ome_tiff_io::get_write_buffer_path(const misaxx::ome::misa_ome_plane_description &t_location) const {
+ome_tiff_io_impl::get_write_buffer_path(const misa_ome_plane_description &t_location) const {
     return m_path.parent_path() / "__misa_ome_write_buffer__" / (m_path.filename().string() + "_" + misaxx::utils::to_string(t_location) + ".ome.tif");
 }
 
-void misaxx::ome::ome_tiff_io::close_writer(bool remove_write_buffer) const {
+void ome_tiff_io_impl::close_writer(bool remove_write_buffer) const {
     std::cout << "[MISA++ OME] Writing results as OME TIFF " << m_path << " ... " << "\n";
     // Save the write buffer files into the path
     auto writer = std::make_shared<::ome::files::out::OMETIFFWriter>();
@@ -113,12 +289,12 @@ void misaxx::ome::ome_tiff_io::close_writer(bool remove_write_buffer) const {
     m_write_buffer.clear();
 }
 
-void misaxx::ome::ome_tiff_io::close_reader() const {
+void ome_tiff_io_impl::close_reader() const {
     m_reader->close();
     m_reader.reset();
 }
 
-void misaxx::ome::ome_tiff_io::open_reader() const {
+void ome_tiff_io_impl::open_reader() const {
     m_reader = std::make_shared<custom_ome_tiff_reader>();
     m_reader->setMetadataFiltered(false);
     m_reader->setGroupFiles(true);
@@ -141,7 +317,7 @@ void misaxx::ome::ome_tiff_io::open_reader() const {
     }
 }
 
-void misaxx::ome::ome_tiff_io::close(bool remove_write_buffer) {
+void ome_tiff_io_impl::close(bool remove_write_buffer) {
     std::unique_lock<std::shared_mutex> wlock(m_mutex, std::defer_lock);
     wlock.lock();
     if(static_cast<bool>(m_reader)) {
@@ -152,7 +328,7 @@ void misaxx::ome::ome_tiff_io::close(bool remove_write_buffer) {
     }
 }
 
-std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> misaxx::ome::ome_tiff_io::get_metadata() const {
+std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> ome_tiff_io_impl::get_metadata() const {
     if(static_cast<bool>(m_metadata)) {
         return m_metadata;
     }
@@ -165,7 +341,7 @@ std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> misaxx::ome::ome_tiff_io::get_
     }
 }
 
-cv::Mat misaxx::ome::ome_tiff_io::read_plane(const misaxx::ome::misa_ome_plane_description &index) const {
+cv::Mat ome_tiff_io_impl::read_plane(const misa_ome_plane_description &index) const {
     if(index.series != 0)
         throw std::runtime_error("Only series 0 is currently supported!");
 
@@ -178,7 +354,7 @@ cv::Mat misaxx::ome::ome_tiff_io::read_plane(const misaxx::ome::misa_ome_plane_d
     }
 }
 
-void misaxx::ome::ome_tiff_io::write_plane(const cv::Mat &image, const misaxx::ome::misa_ome_plane_description &index) {
+void ome_tiff_io_impl::write_plane(const cv::Mat &image, const misa_ome_plane_description &index) {
     // Lock this IO to allow writing to the write buffer
     std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
     lock.lock();
@@ -204,7 +380,7 @@ void misaxx::ome::ome_tiff_io::write_plane(const cv::Mat &image, const misaxx::o
     m_write_buffer[index] = buffer_path;
 }
 
-boost::filesystem::path misaxx::ome::ome_tiff_io::get_base_filename() const {
+boost::filesystem::path ome_tiff_io_impl::get_base_filename() const {
     auto base_name = m_path.filename();
     for(int i = 0; i < 2 && base_name.has_extension(); ++i) {
         base_name.replace_extension();
@@ -212,44 +388,122 @@ boost::filesystem::path misaxx::ome::ome_tiff_io::get_base_filename() const {
     return base_name;
 }
 
-::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_num_series() const {
+::ome::files::dimension_size_type ome_tiff_io_impl::get_num_series() const {
     return get_metadata()->getImageCount();
 }
 
-::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_x(::ome::files::dimension_size_type series) const {
+::ome::files::dimension_size_type ome_tiff_io_impl::get_size_x(::ome::files::dimension_size_type series) const {
     return get_metadata()->getPixelsSizeX(series);
 }
 
-::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_y(::ome::files::dimension_size_type series) const {
+::ome::files::dimension_size_type ome_tiff_io_impl::get_size_y(::ome::files::dimension_size_type series) const {
     return get_metadata()->getPixelsSizeY(series);
 }
 
-::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_z(::ome::files::dimension_size_type series) const {
+::ome::files::dimension_size_type ome_tiff_io_impl::get_size_z(::ome::files::dimension_size_type series) const {
     return get_metadata()->getPixelsSizeZ(series);
 }
 
-::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_t(::ome::files::dimension_size_type series) const {
+::ome::files::dimension_size_type ome_tiff_io_impl::get_size_t(::ome::files::dimension_size_type series) const {
     return get_metadata()->getPixelsSizeT(series);
 }
 
-::ome::files::dimension_size_type misaxx::ome::ome_tiff_io::get_size_c(::ome::files::dimension_size_type series) const {
+::ome::files::dimension_size_type ome_tiff_io_impl::get_size_c(::ome::files::dimension_size_type series) const {
     return get_metadata()->getChannelCount(series);
 }
 
 ::ome::files::dimension_size_type
-misaxx::ome::ome_tiff_io::get_num_planes(::ome::files::dimension_size_type series) const {
+ome_tiff_io_impl::get_num_planes(::ome::files::dimension_size_type series) const {
     return get_size_c(series) * get_size_t(series) * get_size_z(series);
 }
 
-boost::filesystem::path misaxx::ome::ome_tiff_io::get_path() const {
+boost::filesystem::path ome_tiff_io_impl::get_path() const {
     return m_path;
 }
 
-bool misaxx::ome::ome_tiff_io::compression_is_enabled() const {
+bool ome_tiff_io_impl::compression_is_enabled() const {
     return m_enable_compression;
 }
 
-void misaxx::ome::ome_tiff_io::set_compression(bool enabled) {
+void ome_tiff_io_impl::set_compression(bool enabled) {
     m_enable_compression = enabled;
 }
 
+ome_tiff_io::ome_tiff_io() : m_pimpl(new ome_tiff_io_impl()){
+
+}
+
+ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path) : m_pimpl(new ome_tiff_io_impl(std::move(t_path))) {
+
+}
+
+ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path,
+                         std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> t_metadata) :
+        m_pimpl(new ome_tiff_io_impl(std::move(t_path), std::move(t_metadata))){
+
+}
+
+ome_tiff_io::ome_tiff_io(boost::filesystem::path t_path, const ome_tiff_io &t_reference) :
+        m_pimpl(new ome_tiff_io_impl(std::move(t_path), t_reference)){
+
+}
+
+ome_tiff_io::~ome_tiff_io() {
+    delete m_pimpl;
+}
+
+void ome_tiff_io::write_plane(const cv::Mat &image, const misa_ome_plane_description &index) {
+    m_pimpl->write_plane(image, index);
+}
+
+cv::Mat ome_tiff_io::read_plane(const misa_ome_plane_description &index) const {
+    return m_pimpl->read_plane(index);
+}
+
+std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> ome_tiff_io::get_metadata() const {
+    return m_pimpl->get_metadata();
+}
+
+boost::filesystem::path ome_tiff_io::get_path() const {
+    return m_pimpl->get_path();
+}
+
+void ome_tiff_io::close(bool remove_write_buffer) {
+    m_pimpl->close(remove_write_buffer);
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_num_series() const {
+    return m_pimpl->get_num_series();
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_size_x(::ome::files::dimension_size_type series) const {
+    return m_pimpl->get_size_x(series);
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_size_y(::ome::files::dimension_size_type series) const {
+    return m_pimpl->get_size_y(series);
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_size_z(::ome::files::dimension_size_type series) const {
+    return m_pimpl->get_size_z(series);
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_size_t(::ome::files::dimension_size_type series) const {
+    return m_pimpl->get_size_t(series);
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_size_c(::ome::files::dimension_size_type series) const {
+    return m_pimpl->get_size_c(series);
+}
+
+::ome::files::dimension_size_type ome_tiff_io::get_num_planes(::ome::files::dimension_size_type series) const {
+    return m_pimpl->get_num_planes(series);
+}
+
+bool ome_tiff_io::compression_is_enabled() const {
+    return m_pimpl->compression_is_enabled();
+}
+
+void ome_tiff_io::set_compression(bool enabled) {
+    m_pimpl->set_compression(enabled);
+}

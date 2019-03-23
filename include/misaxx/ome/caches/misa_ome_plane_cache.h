@@ -8,7 +8,6 @@
 #include <misaxx/core/misa_manual_cache.h>
 #include <misaxx/core/utils/string.h>
 #include <opencv2/opencv.hpp>
-#include <ome/files/in/OMETIFFReader.h>
 #include <misaxx/core/misa_default_cache.h>
 #include <misaxx/ome/descriptions/misa_ome_plane_description.h>
 
