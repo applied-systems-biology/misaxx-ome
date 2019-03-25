@@ -59,7 +59,9 @@ add_library(misaxx-imaging-ome
         include/misaxx/ome/utils/units_pressure.h
         include/misaxx/ome/utils/units_temperature.h
         include/misaxx/ome/utils/units_time.h
-        include/misaxx/ome/attachments/misa_ome_quantity.h)
+        include/misaxx/ome/attachments/misa_ome_quantity.h
+        include/misaxx/ome/module_info.h
+        src/misaxx/ome/module_info.cpp)
 
 set(MISAXX_LIBRARY misaxx-imaging-ome)
 set(MISAXX_LIBRARY_NAMESPACE misaxx::)
