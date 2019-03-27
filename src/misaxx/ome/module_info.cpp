@@ -1,10 +1,10 @@
-#include <misaxx/core/misa_mutable_module_info.h>
+#include <misaxx/core/misa_module_info.h>
 #include <misaxx/core/module_info.h>
 #include <misaxx/ome/module_info.h>
 #include <misaxx/imaging/module_info.h>
 
 misaxx::misa_module_info misaxx::ome::module_info() {
-    misaxx::misa_mutable_module_info info;
+    misaxx::misa_module_info info;
     info.set_id("misaxx-imaging-ome");
     info.set_version("1.0.0");
     info.set_name("MISA++ OME TIFF Support");
@@ -15,7 +15,7 @@ misaxx::misa_module_info misaxx::ome::module_info() {
     info.set_url("https://asb-git.hki-jena.de/RGerst/misaxx-imaging-ome/");
 
     // External dependency: OME Files
-    misaxx::misa_mutable_module_info ome_files_info;
+    misaxx::misa_module_info ome_files_info;
     ome_files_info.set_id("ome-files");
     ome_files_info.set_name("OME-Files");
     ome_files_info.set_url("https://www.openmicroscopy.org/");
