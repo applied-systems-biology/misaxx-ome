@@ -3,6 +3,7 @@
 #include <misaxx/core/runtime/misa_parameter_registry.h>
 #include <src/misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/core/misa_parameter.h>
+#include <ome/common/log.h>
 
 misaxx::ome::misa_ome_tiff_cache::misa_ome_tiff_cache() {
     m_remove_write_buffer_parameter = misaxx::misa_parameter<bool> { {"runtime", "misaxx-ome", "remove-write-buffer"} };
@@ -22,6 +23,9 @@ misaxx::ome::misa_ome_tiff_cache::misa_ome_tiff_cache() {
 }
 
 void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_description &t_description) {
+
+    // Set the OME log level (needed for Windows)
+    ::ome::common::setLogLevel(::ome::logging::trivial::warning);
 
     if (t_description.filename.empty())
         throw std::runtime_error("Cannot link to file description with empty file name!");
