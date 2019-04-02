@@ -1,3 +1,15 @@
+# /**
+# * Copyright by Ruman Gerst
+# * Research Group Applied Systems Biology - Head: Prof. Dr. Marc Thilo Figge
+# * https://www.leibniz-hki.de/en/applied-systems-biology.html
+# * HKI-Center for Systems Biology of Infection
+# * Leibniz Institute for Natural Product Research and Infection Biology - Hans Knöll Insitute (HKI)
+# * Adolf-Reichwein-Straße 23, 07745 Jena, Germany
+# *
+# * This code is licensed under BSD 2-Clause
+# * See the LICENSE file provided with this code for the full license.
+# */
+
 cmake_minimum_required(VERSION 3.11)
 project(misaxx-imaging-ome VERSION 0.1.0 DESCRIPTION "MISA++ OME Integration")
 
@@ -9,7 +21,6 @@ find_package(OMEFiles 0.5.0 REQUIRED)
 find_package(OMEXML 5.6.0 REQUIRED)
 
 add_library(misaxx-imaging-ome
-        include/misaxx/ome/misa_ome.h
         src/misaxx/ome/utils/ome_to_opencv.h
         src/misaxx/ome/utils/ome_to_opencv.cpp
         include/misaxx/ome/caches/misa_ome_tiff_cache.h
