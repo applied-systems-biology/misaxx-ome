@@ -1,4 +1,4 @@
-The MISA++ OME provides support for OME TIFF files via
+MISA++ OME provides support for OME TIFF files via
 [OME Files](https://www.openmicroscopy.org/ome-files/).
 
 # Copyright
