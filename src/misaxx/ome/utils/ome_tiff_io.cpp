@@ -47,7 +47,7 @@ namespace misaxx::ome {
     struct ome_tiff_io_impl {        
     public:
 
-        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::shared_lock<std::shared_mutex>>;
+        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::unique_lock<std::shared_mutex>>;
         using locked_writer_type = misaxx::utils::locked<std::shared_ptr<::ome::files::out::OMETIFFWriter>, std::unique_lock<std::shared_mutex>>;
 
         ome_tiff_io_impl() = default;
@@ -217,7 +217,7 @@ ome_tiff_io_impl::ome_tiff_io_impl(boost::filesystem::path t_path, const ome_tif
 
 ome_tiff_io_impl::locked_reader_type
 ome_tiff_io_impl::get_reader(const misa_ome_plane_description &t_location) const {
-    std::shared_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
+    std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
     lock.lock();
     if(static_cast<bool>(m_reader)) {
         return locked_reader_type(m_reader, std::move(lock));
