@@ -160,12 +160,6 @@ namespace misaxx::ome {
         mutable std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m_metadata;
         mutable std::mutex m_mutex;
 
-        /**
-         * Returns the filename of the path without .ome.tif extension
-         * @return
-         */
-        boost::filesystem::path get_base_filename() const;
-
         void open_reader() const;
 
         void close_reader() const;
@@ -384,14 +378,6 @@ void ome_tiff_io_impl::write_plane(const cv::Mat &image, const misa_ome_plane_de
         compression = misaxx::imaging::utils::tiff_compression::none;
     misaxx::imaging::utils::tiffwrite(image, buffer_path, compression);
     m_write_buffer[index] = buffer_path;
-}
-
-boost::filesystem::path ome_tiff_io_impl::get_base_filename() const {
-    auto base_name = m_path.filename();
-    for(int i = 0; i < 2 && base_name.has_extension(); ++i) {
-        base_name.replace_extension();
-    }
-    return base_name;
 }
 
 ::ome::files::dimension_size_type ome_tiff_io_impl::get_num_series() const {
