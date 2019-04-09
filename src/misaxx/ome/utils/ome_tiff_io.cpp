@@ -47,8 +47,8 @@ namespace misaxx::ome {
     struct ome_tiff_io_impl {        
     public:
 
-        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::unique_lock<std::shared_mutex>>;
-        using locked_writer_type = misaxx::utils::locked<std::shared_ptr<::ome::files::out::OMETIFFWriter>, std::unique_lock<std::shared_mutex>>;
+        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::unique_lock<std::mutex>>;
+        using locked_writer_type = misaxx::utils::locked<std::shared_ptr<::ome::files::out::OMETIFFWriter>, std::unique_lock<std::mutex>>;
 
         ome_tiff_io_impl() = default;
 
@@ -158,7 +158,7 @@ namespace misaxx::ome {
 
         mutable std::shared_ptr<custom_ome_tiff_reader> m_reader;
         mutable std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m_metadata;
-        mutable std::shared_mutex m_mutex;
+        mutable std::mutex m_mutex;
 
         /**
          * Returns the filename of the path without .ome.tif extension
@@ -217,25 +217,19 @@ ome_tiff_io_impl::ome_tiff_io_impl(boost::filesystem::path t_path, const ome_tif
 
 ome_tiff_io_impl::locked_reader_type
 ome_tiff_io_impl::get_reader(const misa_ome_plane_description &t_location) const {
-    std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
+    std::unique_lock<std::mutex> lock(m_mutex, std::defer_lock);
     lock.lock();
     if(static_cast<bool>(m_reader)) {
         return locked_reader_type(m_reader, std::move(lock));
     }
     else {
-        std::unique_lock<std::shared_mutex> wlock(m_mutex, std::defer_lock);
-
         // Create a global reader from the path. Go into exclusive thread mode for this
-        lock.unlock();
-        wlock.lock();
         if(!m_write_buffer.empty()) {
             close_writer(true);
         }
         open_reader();
-        wlock.unlock();
 
         // Return the locked reader
-        lock.lock();
         return locked_reader_type(m_reader, std::move(lock));
     }
 }
@@ -330,8 +324,8 @@ void ome_tiff_io_impl::open_reader() const {
 }
 
 void ome_tiff_io_impl::close(bool remove_write_buffer) {
-    std::unique_lock<std::shared_mutex> wlock(m_mutex, std::defer_lock);
-    wlock.lock();
+    std::unique_lock<std::mutex> lock(m_mutex, std::defer_lock);
+    lock.lock();
     if(static_cast<bool>(m_reader)) {
         close_reader();
     }
@@ -368,7 +362,7 @@ cv::Mat ome_tiff_io_impl::read_plane(const misa_ome_plane_description &index) co
 
 void ome_tiff_io_impl::write_plane(const cv::Mat &image, const misa_ome_plane_description &index) {
     // Lock this IO to allow writing to the write buffer
-    std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
+    std::unique_lock<std::mutex> lock { m_mutex, std::defer_lock };
     lock.lock();
 
     if(index.series != 0)
