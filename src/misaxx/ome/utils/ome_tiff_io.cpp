@@ -47,8 +47,8 @@ namespace misaxx::ome {
     struct ome_tiff_io_impl {        
     public:
 
-        using locked_reader_type = misaxx::utils::locked<std::shared_ptr<::ome::files::in::OMETIFFReader>, std::unique_lock<std::mutex>>;
-        using locked_writer_type = misaxx::utils::locked<std::shared_ptr<::ome::files::out::OMETIFFWriter>, std::unique_lock<std::mutex>>;
+        using tiff_reader_type = std::shared_ptr<::ome::files::in::OMETIFFReader>;
+        using tiff_writer_type = std::shared_ptr<::ome::files::out::OMETIFFWriter>;
 
         ome_tiff_io_impl() = default;
 
@@ -158,7 +158,7 @@ namespace misaxx::ome {
 
         mutable std::shared_ptr<custom_ome_tiff_reader> m_reader;
         mutable std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> m_metadata;
-        mutable std::mutex m_mutex;
+        mutable std::shared_mutex m_mutex;
 
         void open_reader() const;
 
@@ -183,7 +183,7 @@ namespace misaxx::ome {
         * If applicable, returns a reader to a plane in the write buffer
         * @return
         */
-        locked_reader_type get_reader(const misa_ome_plane_description &t_location) const;
+        tiff_reader_type get_reader(const misa_ome_plane_description &t_location) const;
     };
 }
 
@@ -209,51 +209,15 @@ ome_tiff_io_impl::ome_tiff_io_impl(boost::filesystem::path t_path, const ome_tif
         : ome_tiff_io_impl(std::move(t_path), t_reference.get_metadata()) {
 }
 
-ome_tiff_io_impl::locked_reader_type
+ome_tiff_io_impl::tiff_reader_type
 ome_tiff_io_impl::get_reader(const misa_ome_plane_description &t_location) const {
-    std::unique_lock<std::mutex> lock(m_mutex, std::defer_lock);
-    lock.lock();
-    if(static_cast<bool>(m_reader)) {
-        return locked_reader_type(m_reader, std::move(lock));
-    }
-    else {
-        // Create a global reader from the path. Go into exclusive thread mode for this
+    if(!static_cast<bool>(m_reader)) {
         if(!m_write_buffer.empty()) {
             close_writer(true);
         }
         open_reader();
-
-        // Return the locked reader
-        return locked_reader_type(m_reader, std::move(lock));
     }
-}
-
-void ome_tiff_io_impl::initialize_write_buffer_from_reader() const {
-    std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... " << "\n";
-    for(size_t series = 0; series < get_num_series(); ++series) {
-        m_reader->setSeries(series);
-        const auto size_Z = m_reader->getSizeZ();
-        const auto size_C = m_reader->getEffectiveSizeC();
-        const auto size_T = m_reader->getSizeT();
-
-        for(size_t z = 0; z < size_Z; ++z) {
-            for(size_t c = 0; c < size_C; ++c) {
-                for (size_t t = 0; t < size_T; ++t) {
-                    const misa_ome_plane_description location(series, z, c, t);
-                    const auto location_name = misaxx::utils::to_string(location);
-                    std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << "\n";
-
-                    const boost::filesystem::path buffer_path = get_write_buffer_path(location);
-                    if(!boost::filesystem::is_directory(buffer_path.parent_path())) {
-                        boost::filesystem::create_directories(buffer_path.parent_path());
-                    }
-
-                    cv::Mat tmp = ome_to_opencv(*m_reader, misa_ome_plane_description(series, z, c, t));
-                    misaxx::imaging::utils::tiffwrite(tmp, buffer_path);
-                }
-            }
-        }
-    }
+    return m_reader;
 }
 
 boost::filesystem::path
@@ -318,7 +282,7 @@ void ome_tiff_io_impl::open_reader() const {
 }
 
 void ome_tiff_io_impl::close(bool remove_write_buffer) {
-    std::unique_lock<std::mutex> lock(m_mutex, std::defer_lock);
+    std::unique_lock<std::shared_mutex> lock(m_mutex, std::defer_lock);
     lock.lock();
     if(static_cast<bool>(m_reader)) {
         close_reader();
@@ -336,6 +300,10 @@ std::shared_ptr<::ome::xml::meta::OMEXMLMetadata> ome_tiff_io_impl::get_metadata
         // We are currently reading a file. Open it and fetch the metadata
         if(!m_write_buffer.empty())
             throw std::logic_error("Write buffer is active, but no metadata is set!");
+        std::cout << "[MISA++ OME] Locking " << m_path << " to obtain OME XML metadata" << "\n";
+        std::unique_lock<std::shared_mutex> lock { m_mutex, std::defer_lock };
+        lock.lock();
+        std::cout << "[MISA++ OME] Locking " << m_path << " to obtain OME XML metadata ... successful" << "\n";
         get_reader(misa_ome_plane_description(0, 0, 0, 0));
         return m_metadata;
     }
@@ -345,9 +313,20 @@ cv::Mat ome_tiff_io_impl::read_plane(const misa_ome_plane_description &index) co
     if(index.series != 0)
         throw std::runtime_error("Only series 0 is currently supported!");
 
+    std::cout << "[MISA++ OME] Soft locking " << m_path << " to read data" << "\n";
+    std::shared_lock<std::shared_mutex> lock { m_mutex, std::defer_lock };
+    lock.lock();
+    std::cout << "[MISA++ OME] Soft locking " << m_path << " to read data .. successful" << "\n";
+
     if(m_write_buffer.find(index) == m_write_buffer.end()) {
-        auto reader = get_reader(index);
-        return ome_to_opencv(*reader.value, index);
+
+        lock.unlock();
+        std::cout << "[MISA++ OME] Locking " << m_path << " to read data from OME TIFF" << "\n";
+        std::unique_lock<std::shared_mutex> wlock { m_mutex, std::defer_lock };
+        wlock.lock();
+        std::cout << "[MISA++ OME] Locking " << m_path << " to read data from OME TIFF .. successful" << "\n";
+
+        return ome_to_opencv(*get_reader(index), index);
     } else {
         // The write buffer contains only standard TIFFs
         return misaxx::imaging::utils::tiffread(m_write_buffer.at(index));
@@ -356,15 +335,41 @@ cv::Mat ome_tiff_io_impl::read_plane(const misa_ome_plane_description &index) co
 
 void ome_tiff_io_impl::write_plane(const cv::Mat &image, const misa_ome_plane_description &index) {
     // Lock this IO to allow writing to the write buffer
-    std::unique_lock<std::mutex> lock { m_mutex, std::defer_lock };
+    std::cout << "[MISA++ OME] Locking " << m_path << " to write data" << "\n";
+    std::unique_lock<std::shared_mutex> lock { m_mutex, std::defer_lock };
     lock.lock();
+    std::cout << "[MISA++ OME] Locking " << m_path << " to write data ... successful" << "\n";
 
     if(index.series != 0)
         throw std::runtime_error("Only series 0 is currently supported!");
 
     // If the file already exists, we have to create a write buffer
     if(m_write_buffer.empty() && boost::filesystem::exists(m_path)) {
-        initialize_write_buffer_from_reader();
+        std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... " << "\n";
+        for(size_t series = 0; series < get_num_series(); ++series) {
+            m_reader->setSeries(series);
+            const auto size_Z = m_reader->getSizeZ();
+            const auto size_C = m_reader->getEffectiveSizeC();
+            const auto size_T = m_reader->getSizeT();
+
+            for(size_t z = 0; z < size_Z; ++z) {
+                for(size_t c = 0; c < size_C; ++c) {
+                    for (size_t t = 0; t < size_T; ++t) {
+                        const misa_ome_plane_description location(series, z, c, t);
+                        const auto location_name = misaxx::utils::to_string(location);
+                        std::cout << "[MISA++ OME] Preparing write mode for existing OME TIFF " << m_path << " ... writing plane " << location_name << "\n";
+
+                        const boost::filesystem::path buffer_path = get_write_buffer_path(location);
+                        if(!boost::filesystem::is_directory(buffer_path.parent_path())) {
+                            boost::filesystem::create_directories(buffer_path.parent_path());
+                        }
+
+                        cv::Mat tmp = ome_to_opencv(*m_reader, misa_ome_plane_description(series, z, c, t));
+                        misaxx::imaging::utils::tiffwrite(tmp, buffer_path);
+                    }
+                }
+            }
+        }
     }
 
     const boost::filesystem::path buffer_path = get_write_buffer_path(index);
