@@ -313,18 +313,18 @@ cv::Mat ome_tiff_io_impl::read_plane(const misa_ome_plane_description &index) co
     if(index.series != 0)
         throw std::runtime_error("Only series 0 is currently supported!");
 
-    std::cout << "[MISA++ OME] Soft locking " << m_path << " to read data" << "\n";
+//    std::cout << "[MISA++ OME] Soft locking " << m_path << " to read data" << "\n";
     std::shared_lock<std::shared_mutex> lock { m_mutex, std::defer_lock };
     lock.lock();
-    std::cout << "[MISA++ OME] Soft locking " << m_path << " to read data .. successful" << "\n";
+//    std::cout << "[MISA++ OME] Soft locking " << m_path << " to read data .. successful" << "\n";
 
     if(m_write_buffer.find(index) == m_write_buffer.end()) {
 
         lock.unlock();
-        std::cout << "[MISA++ OME] Locking " << m_path << " to read data from OME TIFF" << "\n";
+//        std::cout << "[MISA++ OME] Locking " << m_path << " to read data from OME TIFF" << "\n";
         std::unique_lock<std::shared_mutex> wlock { m_mutex, std::defer_lock };
         wlock.lock();
-        std::cout << "[MISA++ OME] Locking " << m_path << " to read data from OME TIFF .. successful" << "\n";
+//        std::cout << "[MISA++ OME] Locking " << m_path << " to read data from OME TIFF .. successful" << "\n";
 
         return ome_to_opencv(*get_reader(index), index);
     } else {
@@ -335,10 +335,10 @@ cv::Mat ome_tiff_io_impl::read_plane(const misa_ome_plane_description &index) co
 
 void ome_tiff_io_impl::write_plane(const cv::Mat &image, const misa_ome_plane_description &index) {
     // Lock this IO to allow writing to the write buffer
-    std::cout << "[MISA++ OME] Locking " << m_path << " to write data" << "\n";
+//    std::cout << "[MISA++ OME] Locking " << m_path << " to write data" << "\n";
     std::unique_lock<std::shared_mutex> lock { m_mutex, std::defer_lock };
     lock.lock();
-    std::cout << "[MISA++ OME] Locking " << m_path << " to write data ... successful" << "\n";
+//    std::cout << "[MISA++ OME] Locking " << m_path << " to write data ... successful" << "\n";
 
     if(index.series != 0)
         throw std::runtime_error("Only series 0 is currently supported!");
