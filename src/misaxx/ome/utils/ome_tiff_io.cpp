@@ -174,11 +174,6 @@ namespace misaxx::ome {
         boost::filesystem::path get_write_buffer_path(const misa_ome_plane_description &t_location) const;
 
         /**
-         * Copies all TIFF images stored inside the current reader into the buffer directory
-         */
-        void initialize_write_buffer_from_reader() const;
-
-        /**
         * Thread-safe access to the managed reader
         * If applicable, returns a reader to a plane in the write buffer
         * @return
