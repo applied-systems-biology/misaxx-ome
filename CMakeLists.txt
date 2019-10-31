@@ -11,7 +11,7 @@
 # */
 
 cmake_minimum_required(VERSION 3.11)
-project(misaxx-imaging-ome VERSION 0.1.0 DESCRIPTION "MISA++ OME Integration")
+project(misaxx-imaging-ome VERSION 1.0.0.1 DESCRIPTION "MISA++ OME Integration")
 
 find_package(misaxx-core REQUIRED)
 find_package(misaxx-imaging REQUIRED)
