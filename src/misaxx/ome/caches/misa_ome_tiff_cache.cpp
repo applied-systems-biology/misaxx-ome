@@ -16,6 +16,7 @@
 #include <src/misaxx/ome/utils/ome_tiff_io.h>
 #include <misaxx/core/misa_parameter.h>
 #include <ome/common/log.h>
+#include <misaxx/core/utils/filesystem.h>
 
 misaxx::ome::misa_ome_tiff_cache::misa_ome_tiff_cache() {
     m_remove_write_buffer_parameter = misaxx::misa_parameter<bool> { {"runtime", "misaxx-ome", "remove-write-buffer"} };
@@ -44,6 +45,10 @@ void misaxx::ome::misa_ome_tiff_cache::do_link(const misaxx::ome::misa_ome_tiff_
 
     // We do cache initialization during linkage
     this->set_unique_location(this->get_location() / t_description.filename);
+
+    // OME TIFF is very sensitive about file paths
+    // Convert to preferred representation
+    this->set_unique_location(misaxx::utils::make_preferred(this->get_unique_location()));
 
     if (boost::filesystem::exists(this->get_unique_location())) {
         std::cout << "[Cache] Opening OME TIFF " << this->get_unique_location() << "\n";
